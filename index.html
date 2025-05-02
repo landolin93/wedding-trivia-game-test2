@@ -8,7 +8,7 @@
   <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Firebase Compat SDK for non-module support -->
+  <!-- Firebase Compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 </head>
@@ -16,7 +16,7 @@
   <div id="root" class="min-h-screen flex items-center justify-center"></div>
 
   <script type="text/babel">
-    // Initialize Firebase with provided config
+    // Initialize Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyD-uMdBpQhau_mQRQwtUqDbNqlPR8LVfq4",
       authDomain: "wedding-trivia-test.firebaseapp.com",
@@ -29,7 +29,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const questions = [
+    // 20 wedding-themed questions
+    const allQuestions = [
       {
         question: "Where did the couple first meet?",
         options: ["College", "Coffee Shop", "Mutual Friend", "Online"],
@@ -49,19 +50,112 @@
         question: "What song did they choose for their first dance?",
         options: ["Perfect by Ed Sheeran", "At Last by Etta James", "Can't Help Falling in Love by Elvis Presley", "All of Me by John Legend"],
         correct: "Can't Help Falling in Love by Elvis Presley"
+      },
+      {
+        question: "What is the couple’s favorite dessert to share?",
+        options: ["Chocolate Cake", "Ice Cream", "Cheesecake", "Tiramisu"],
+        correct: "Cheesecake"
+      },
+      {
+        question: "Where was their first date?",
+        options: ["Movie Theater", "Restaurant", "Park", "Beach"],
+        correct: "Restaurant"
+      },
+      {
+        question: "What pet does the couple own together?",
+        options: ["Dog", "Cat", "Fish", "None"],
+        correct: "Dog"
+      },
+      {
+        question: "What is the couple’s favorite movie to watch together?",
+        options: ["The Notebook", "Inception", "La La Land", "Star Wars"],
+        correct: "La La Land"
+      },
+      {
+        question: "What season did the couple get engaged in?",
+        options: ["Spring", "Summer", "Fall", "Winter"],
+        correct: "Fall"
+      },
+      {
+        question: "What is the couple’s favorite weekend activity?",
+        options: ["Brunch", "Hiking", "Movie Night", "Shopping"],
+        correct: "Brunch"
+      },
+      {
+        question: "What color is the couple’s wedding theme?",
+        options: ["Blue", "Pink", "Gold", "Green"],
+        correct: "Pink"
+      },
+      {
+        question: "What instrument does one of the couple play?",
+        options: ["Guitar", "Piano", "Violin", "None"],
+        correct: "Piano"
+      },
+      {
+        question: "What is the couple’s favorite holiday?",
+        options: ["Christmas", "Halloween", "Thanksgiving", "Valentine’s Day"],
+        correct: "Christmas"
+      },
+      {
+        question: "Where did the couple get engaged?",
+        options: ["Beach", "Mountain", "City Park", "Restaurant"],
+        correct: "Beach"
+      },
+      {
+        question: "What is the couple’s favorite board game?",
+        options: ["Monopoly", "Scrabble", "Catan", "Chess"],
+        correct: "Scrabble"
+      },
+      {
+        question: "What type of cuisine do they love most?",
+        options: ["Italian", "Mexican", "Japanese", "Indian"],
+        correct: "Italian"
+      },
+      {
+        question: "What was the couple’s first concert together?",
+        options: ["Coldplay", "Beyoncé", "The Beatles Tribute", "Local Band"],
+        correct: "Coldplay"
+      },
+      {
+        question: "What is the couple’s dream vacation spot?",
+        options: ["Maldives", "Italy", "Australia", "Canada"],
+        correct: "Italy"
+      },
+      {
+        question: "What sport do they enjoy watching together?",
+        options: ["Football", "Basketball", "Tennis", "None"],
+        correct: "Tennis"
+      },
+      {
+        question: "What is the couple’s favorite coffee order?",
+        options: ["Latte", "Cappuccino", "Black Coffee", "Mocha"],
+        correct: "Latte"
       }
     ];
 
+    // Fisher-Yates shuffle
+    function shuffle(array) {
+      const newArray = [...array];
+      for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      }
+      return newArray;
+    }
+
     function TriviaGame() {
-      const [gameState, setGameState] = React.useState('nameInput'); // nameInput, playing, result
+      const [gameState, setGameState] = React.useState('nameInput');
       const [firstName, setFirstName] = React.useState('');
       const [lastName, setLastName] = React.useState('');
       const [currentQuestion, setCurrentQuestion] = React.useState(0);
       const [score, setScore] = React.useState(0);
       const [selectedOption, setSelectedOption] = React.useState(null);
       const [leaderboard, setLeaderboard] = React.useState([]);
+      const [questions, setQuestions] = React.useState([]);
+      const [timer, setTimer] = React.useState(20);
+      const [answered, setAnswered] = React.useState(false);
 
-      // Fetch leaderboard from Firestore on component mount
+      // Fetch leaderboard
       React.useEffect(() => {
         const unsubscribe = db.collection('leaderboard')
           .orderBy('score', 'desc')
@@ -75,6 +169,26 @@
         return () => unsubscribe();
       }, []);
 
+      // Initialize questions and timer
+      React.useEffect(() => {
+        if (gameState === 'playing' && questions.length === 0) {
+          const shuffledQuestions = shuffle(allQuestions).slice(0, 10);
+          setQuestions(shuffledQuestions);
+        }
+      }, [gameState]);
+
+      // Timer logic
+      React.useEffect(() => {
+        if (gameState === 'playing' && !answered && timer > 0) {
+          const interval = setInterval(() => {
+            setTimer(prev => prev - 1);
+          }, 1000);
+          return () => clearInterval(interval);
+        } else if (timer === 0 && !answered) {
+          handleTimeout();
+        }
+      }, [timer, gameState, answered]);
+
       const handleNameSubmit = (e) => {
         e.preventDefault();
         if (firstName.trim() && lastName.trim()) {
@@ -84,22 +198,40 @@
         }
       };
 
+      const handleTimeout = () => {
+        if (currentQuestion + 1 < questions.length) {
+          setCurrentQuestion(currentQuestion + 1);
+          setTimer(20);
+          setAnswered(false);
+          setSelectedOption(null);
+        } else {
+          // Save score to Firestore
+          db.collection('leaderboard').add({
+            name: `${firstName} ${lastName}`,
+            score: score,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(error => console.error('Error saving score:', error));
+          setGameState('result');
+        }
+      };
+
       const handleAnswer = (option) => {
         setSelectedOption(option);
+        setAnswered(true);
         if (option === questions[currentQuestion].correct) {
           setScore(score + 1);
         }
         setTimeout(() => {
           if (currentQuestion + 1 < questions.length) {
             setCurrentQuestion(currentQuestion + 1);
+            setTimer(20);
+            setAnswered(false);
             setSelectedOption(null);
           } else {
-            // Calculate final score
-            const finalScore = score + (option === questions[currentQuestion].correct ? 1 : 0);
             // Save score to Firestore
             db.collection('leaderboard').add({
               name: `${firstName} ${lastName}`,
-              score: finalScore,
+              score: score + (option === questions[currentQuestion].correct ? 1 : 0),
               timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).catch(error => console.error('Error saving score:', error));
             setGameState('result');
@@ -114,7 +246,13 @@
         setCurrentQuestion(0);
         setScore(0);
         setSelectedOption(null);
+        setQuestions([]);
+        setTimer(20);
+        setAnswered(false);
       };
+
+      // Randomize options for current question
+      const randomizedOptions = questions.length > 0 ? shuffle(questions[currentQuestion].options) : [];
 
       return (
         <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full text-center">
@@ -149,25 +287,24 @@
             </div>
           )}
 
-          {gameState === 'playing' && (
+          {gameState === 'playing' && questions.length > 0 && (
             <div>
               <h1 className="text-3xl font-bold mb-4 text-pink-600">Wedding Trivia Game</h1>
               <p className="text-lg mb-6">Welcome, {firstName} {lastName}!</p>
+              <p className="text-md mb-4 text-red-600">Time left: {timer}s</p>
               <h2 className="text-xl font-semibold mb-4">
                 Question {currentQuestion + 1} of {questions.length}
               </h2>
               <p className="text-lg mb-6">{questions[currentQuestion].question}</p>
               <div className="space-y-4">
-                {questions[currentQuestion].options.map((option, index) => (
+                {randomizedOptions.map((option, index) => (
                   <button
                     key={index}
                     onClick={() => handleAnswer(option)}
-                    disabled={selectedOption !== null}
+                    disabled={selectedOption !== null || answered}
                     className={`w-full py-2 px-4 rounded-lg text-left transition-colors ${
                       selectedOption === option
-                        ? option === questions[currentQuestion].correct
-                          ? 'bg-green-500 text-white'
-                          : 'bg-red-500 text-white'
+                        ? 'bg-gray-400 text-white'
                         : 'bg-gray-200 hover:bg-gray-300'
                     }`}
                   >
@@ -196,7 +333,7 @@
                 {leaderboard.length > 0 ? (
                   leaderboard.map((entry, index) => (
                     <li key={index}>
-                      {index + 1}. {entry.name}: {entry.score}/{questions.length}
+                      {index + 1}. {entry.name}: {entry.score}/10
                     </li>
                   ))
                 ) : (
