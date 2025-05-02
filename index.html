@@ -14,6 +14,10 @@
 </head>
 <body class="bg-gray-100 font-sans">
   <div id="root" class="min-h-screen flex items-center justify-center"></div>
+  <audio id="background-music" loop autoplay>
+    <source src="https://landolin93.github.io/wedding-trivia-game-test2/canon-in-d.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
 
   <script type="text/babel">
     // Initialize Firebase
@@ -163,6 +167,21 @@
       const [leaderboardError, setLeaderboardError] = React.useState(null);
       const [isLoading, setIsLoading] = React.useState(true);
       const [questionStartTime, setQuestionStartTime] = React.useState(null);
+
+      // Control background music
+      React.useEffect(() => {
+        const audio = document.getElementById('background-music');
+        audio.volume = 0.2; // Low volume to avoid distraction
+        audio.play().catch(error => {
+          console.log('Autoplay prevented:', error);
+          // Play on first user interaction if autoplay is blocked
+          const handleInteraction = () => {
+            audio.play();
+            document.removeEventListener('click', handleInteraction);
+          };
+          document.addEventListener('click', handleInteraction);
+        });
+      }, []);
 
       // Fetch leaderboards
       React.useEffect(() => {
@@ -573,47 +592,4 @@
               <div className="space-y-4 mb-6">
                 <button
                   onClick={() => setLeaderboardType('mini')}
-                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
-                >
-                  View Mini Game Leaderboard
-                </button>
-                <button
-                  onClick={() => setLeaderboardType('full')}
-                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
-                >
-                  View Full Game Leaderboard
-                </button>
-                <div className="space-x-4">
-                  <button
-                    onClick={() => setLeaderboardView('top5')}
-                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : 'bg-gray-200'}`}
-                  >
-                    Top 5
-                  </button>
-                  <button
-                    onClick={() => setLeaderboardView('all')}
-                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : 'bg-gray-200'}`}
-                  >
-                    All
-                  </button>
-                </div>
-              </div>
-              {renderLeaderboards()}
-              <button
-                onClick={() => setGameState('mainMenu')}
-                className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors mt-4"
-              >
-                🪴 Back to Main Menu
-              </button>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    const rootElement = document.getElementById('root');
-    const root = ReactDOM.createRoot(rootElement);
-    root.render(<TriviaGame />);
-  </script>
-</body>
-</html>
+                  class
