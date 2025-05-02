@@ -144,7 +144,7 @@
     }
 
     function TriviaGame() {
-      const [gameState, setGameState] = React.useState('modeSelect');
+      const [gameState, setGameState] = React.useState('mainMenu');
       const [firstName, setFirstName] = React.useState('');
       const [lastName, setLastName] = React.useState('');
       const [gameMode, setGameMode] = React.useState(null);
@@ -307,7 +307,7 @@
       };
 
       const restartGame = () => {
-        setGameState('modeSelect');
+        setGameState('mainMenu');
         setFirstName('');
         setLastName('');
         setGameMode(null);
@@ -343,7 +343,7 @@
 
         return (
           <div>
-            <h3 className="text-xl font-semibold mb-4">{leaderboardTitle}</h3>
+            <h3 className="text-xl font-semibold mb-4">Current: {leaderboardTitle}</h3>
             {isLoading ? (
               <p className="text-lg mb-6">Loading leaderboard...</p>
             ) : leaderboardError ? (
@@ -361,65 +361,127 @@
                 )}
               </ul>
             )}
-            <div className="space-x-4">
-              <button
-                onClick={() => setLeaderboardView('top5')}
-                className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-pink-600 text-white' : 'bg-gray-200'}`}
-              >
-                Top 5
-              </button>
-              <button
-                onClick={() => setLeaderboardView('all')}
-                className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-pink-600 text-white' : 'bg-gray-200'}`}
-              >
-                All
-              </button>
-            </div>
           </div>
         );
       };
 
       return (
         <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full text-center">
-          {gameState === 'modeSelect' && (
+          {gameState === 'mainMenu' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4 text-pink-600">Wedding Trivia Game</h1>
-              <p className="text-lg mb-6">Choose your game mode or view leaderboards!</p>
-              <div className="space-y-4 mb-6">
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">Wedding Trivia Game</h1>
+              <p className="text-lg mb-6">Welcome to the trivia game!</p>
+              <div className="space-y-4">
                 <button
-                  onClick={() => setLeaderboardType('mini')}
-                  className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                  onClick={() => setGameState('leaderboardSelect')}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
-                  View Mini Game Leaderboard
+                  View Leaderboard
                 </button>
                 <button
-                  onClick={() => setLeaderboardType('full')}
-                  className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                  onClick={() => setGameState('playGame')}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
-                  View Full Game Leaderboard
-                </button>
-              </div>
-              {renderLeaderboards()}
-              <div className="space-y-4 mt-6">
-                <button
-                  onClick={() => handleModeSelect('mini')}
-                  className="w-full bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors"
-                >
-                  Play Mini Game (10 Questions, 20s Timer)
-                </button>
-                <button
-                  onClick={() => handleModeSelect('full')}
-                  className="w-full bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors"
-                >
-                  Play Full Game (20 Questions, No Timer)
+                  Play Game
                 </button>
               </div>
             </div>
           )}
 
+          {gameState === 'leaderboardSelect' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">Leaderboards</h1>
+              <p className="text-lg mb-6">Select a leaderboard to view</p>
+              <div className="space-y-4 mb-6">
+                <button
+                  onClick={() => setGameState('miniLeaderboard')}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  Mini Game Leaderboard
+                </button>
+                <button
+                  onClick={() => setGameState('fullLeaderboard')}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  Full Game Leaderboard
+                </button>
+              </div>
+              <button
+                onClick={() => setGameState('mainMenu')}
+                className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors mt-4"
+              >
+                🪴 Back to Main Menu
+              </button>
+            </div>
+          )}
+
+          {(gameState === 'miniLeaderboard' || gameState === 'fullLeaderboard') && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">
+                {gameState === 'miniLeaderboard' ? 'Mini Game Leaderboard' : 'Full Game Leaderboard'}
+              </h1>
+              <div className="space-y-4 mb-6">
+                <div className="space-x-4">
+                  <button
+                    onClick={() => setLeaderboardView('top5')}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : 'bg-gray-200'}`}
+                  >
+                    Top 5
+                  </button>
+                  <button
+                    onClick={() => setLeaderboardView('all')}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : 'bg-gray-200'}`}
+                  >
+                    All
+                  </button>
+                </div>
+                <button
+                  onClick={() => setGameState('leaderboardSelect')}
+                  className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Back to Leaderboard Selection
+                </button>
+              </div>
+              {renderLeaderboards()}
+              <button
+                onClick={() => setGameState('mainMenu')}
+                className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors mt-4"
+              >
+                🪴 Back to Main Menu
+              </button>
+            </div>
+          )}
+
+          {gameState === 'playGame' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">Play Game</h1>
+              <p className="text-lg mb-6">Choose a game mode</p>
+              <div className="space-y-4">
+                <button
+                  onClick={() => handleModeSelect('mini')}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  Play Mini Game (10 Questions, 20s Timer)
+                </button>
+                <button
+                  onClick={() => handleModeSelect('full')}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  Play Full Game (20 Questions, No Timer)
+                </button>
+              </div>
+              <button
+                onClick={() => setGameState('mainMenu')}
+                className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors mt-4"
+              >
+                🪴 Back to Main Menu
+              </button>
+            </div>
+          )}
+
           {gameState === 'nameInput' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4 text-pink-600">Wedding Trivia Game</h1>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">Wedding Trivia Game</h1>
               <p className="text-lg mb-6">Enter your name to start the {gameMode === 'mini' ? 'Mini' : 'Full'} Game!</p>
               <form onSubmit={handleNameSubmit} className="space-y-4">
                 <input
@@ -440,17 +502,29 @@
                 />
                 <button
                   type="submit"
-                  className="bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors"
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   Start Game
                 </button>
+                <button
+                  onClick={() => setGameState('playGame')}
+                  className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Back to Play Game
+                </button>
               </form>
+              <button
+                onClick={() => setGameState('mainMenu')}
+                className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors mt-4"
+              >
+                🪴 Back to Main Menu
+              </button>
             </div>
           )}
 
           {gameState === 'playing' && questions.length > 0 && (
             <div>
-              <h1 className="text-3xl font-bold mb-4 text-pink-600">Wedding Trivia Game</h1>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">Wedding Trivia Game</h1>
               <p className="text-lg mb-6">Welcome, {firstName} {lastName}!</p>
               {gameMode === 'mini' && (
                 <p className="text-md mb-4 text-red-600">Time left: {timer}s</p>
@@ -471,6 +545,12 @@
                   </button>
                 ))}
               </div>
+              <button
+                onClick={() => setGameState('mainMenu')}
+                className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors mt-4"
+              >
+                🪴 Back to Main Menu
+              </button>
             </div>
           )}
 
@@ -493,23 +573,37 @@
               <div className="space-y-4 mb-6">
                 <button
                   onClick={() => setLeaderboardType('mini')}
-                  className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   View Mini Game Leaderboard
                 </button>
                 <button
                   onClick={() => setLeaderboardType('full')}
-                  className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   View Full Game Leaderboard
                 </button>
+                <div className="space-x-4">
+                  <button
+                    onClick={() => setLeaderboardView('top5')}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : 'bg-gray-200'}`}
+                  >
+                    Top 5
+                  </button>
+                  <button
+                    onClick={() => setLeaderboardView('all')}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : 'bg-gray-200'}`}
+                  >
+                    All
+                  </button>
+                </div>
               </div>
               {renderLeaderboards()}
               <button
-                onClick={restartGame}
-                className="bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors mt-6"
+                onClick={() => setGameState('mainMenu')}
+                className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors mt-4"
               >
-                Play Again
+                🪴 Back to Main Menu
               </button>
             </div>
           )}
