@@ -17,7 +17,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 font-sans">
+<body class="bg-gray-100 font-sans">
   <div id="root" class="min-h-screen flex items-center justify-center"></div>
   <audio id="background-music" loop autoplay>
     <source src="https://landolin93.github.io/wedding-trivia-game-test2/wedding-romantic-182518.mp3" type="audio/mpeg">
@@ -178,7 +178,15 @@
       // Toggle dark mode class
       React.useEffect(() => {
         document.documentElement.classList.toggle('dark', darkMode);
-        console.log('Dark mode:', darkMode, 'Class:', document.documentElement.classList.contains('dark'));
+        const root = document.getElementById('root').firstChild;
+        if (darkMode) {
+          root.classList.add('bg-gray-800', 'text-gray-100');
+          root.classList.remove('bg-white', 'text-gray-900');
+        } else {
+          root.classList.add('bg-white', 'text-gray-900');
+          root.classList.remove('bg-gray-800', 'text-gray-100');
+        }
+        console.log('Dark mode:', darkMode, 'HTML Class:', document.documentElement.classList.contains('dark'), 'Root Classes:', root.classList);
       }, [darkMode]);
 
       // Control background music
@@ -396,13 +404,13 @@
 
         return (
           <div>
-            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Current: {leaderboardTitle}</h3>
+            <h3 className="text-xl font-semibold mb-4">Current: {leaderboardTitle}</h3>
             {isLoading ? (
-              <p className="text-lg mb-6 text-gray-900 dark:text-gray-100">Loading leaderboard...</p>
+              <p className="text-lg mb-6">Loading leaderboard...</p>
             ) : leaderboardError ? (
               <p className="text-lg mb-6 text-red-600">{leaderboardError}</p>
             ) : (
-              <ul className="text-lg mb-6 space-y-2 text-gray-900 dark:text-gray-100">
+              <ul className="text-lg mb-6 space-y-2">
                 {uniqueLeaderboard.length > 0 ? (
                   uniqueLeaderboard.slice(0, maxEntries).map((entry, index) => (
                     <li key={index}>
@@ -419,17 +427,17 @@
       }, [leaderboardType, leaderboardView, miniLeaderboard, fullLeaderboard, isLoading, leaderboardError]);
 
       return (
-        <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-lg w-full text-center relative">
+        <div className={`p-8 rounded-lg shadow-lg max-w-lg w-full text-center relative ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
           <button
             onClick={() => setMuted(!muted)}
-            className="absolute top-4 right-4 text-2xl text-gray-900 dark:text-gray-100"
+            className="absolute top-4 right-4 text-2xl"
           >
             {muted ? '\u{1F507}' : '\u{1F509}'}
           </button>
           {gameState === 'mainMenu' && (
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="absolute top-4 left-4 text-2xl text-gray-900 dark:text-gray-100"
+              className="absolute top-4 left-4 text-2xl"
             >
               {darkMode ? '\u{2600}' : '\u{1F319}'}
             </button>
@@ -437,17 +445,17 @@
           {gameState === 'mainMenu' && (
             <div>
               <h1 className="text-3xl font-bold mb-4 text-amber-600">Wedding Trivia Game</h1>
-              <p className="text-lg mb-6 text-gray-900 dark:text-gray-100">Welcome to the trivia game!</p>
+              <p className="text-lg mb-6">Welcome to the trivia game!</p>
               <div className="space-y-4">
                 <button
                   onClick={() => setGameState('leaderboardSelect')}
-                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
                 >
                   View Leaderboard
                 </button>
                 <button
                   onClick={() => setGameState('playGame')}
-                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
                 >
                   Play Game
                 </button>
@@ -458,24 +466,24 @@
           {gameState === 'leaderboardSelect' && (
             <div>
               <h1 className="text-3xl font-bold mb-4 text-amber-600">Leaderboards</h1>
-              <p className="text-lg mb-6 text-gray-900 dark:text-gray-100">Select a leaderboard to view</p>
+              <p className="text-lg mb-6">Select a leaderboard to view</p>
               <div className="space-y-4 mb-6">
                 <button
                   onClick={() => setGameState('miniLeaderboard')}
-                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
                 >
                   Mini Game Leaderboard
                 </button>
                 <button
                   onClick={() => setGameState('fullLeaderboard')}
-                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
                 >
                   Full Game Leaderboard
                 </button>
               </div>
               <button
                 onClick={() => setGameState('mainMenu')}
-                className="w-full bg-gray-200 dark:bg-gray-700 py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors mt-4"
+                className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
               >
                 🪴 Back to Main Menu
               </button>
@@ -491,20 +499,20 @@
                 <div className="space-x-4">
                   <button
                     onClick={() => setLeaderboardView('top5')}
-                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                   >
                     Top 5
                   </button>
                   <button
                     onClick={() => setLeaderboardView('all')}
-                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                   >
                     All
                   </button>
                 </div>
                 <button
                   onClick={() => setGameState('leaderboardSelect')}
-                  className="w-full bg-gray-200 dark:bg-gray-700 py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   Back to Leaderboard Selection
                 </button>
@@ -512,7 +520,7 @@
               {renderLeaderboards()}
               <button
                 onClick={() => setGameState('mainMenu')}
-                className="w-full bg-gray-200 dark:bg-gray-700 py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors mt-4"
+                className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
               >
                 🪴 Back to Main Menu
               </button>
@@ -522,24 +530,24 @@
           {gameState === 'playGame' && (
             <div>
               <h1 className="text-3xl font-bold mb-4 text-amber-600">Play Game</h1>
-              <p className="text-lg mb-6 text-gray-900 dark:text-gray-100">Choose a game mode</p>
+              <p className="text-lg mb-6">Choose a game mode</p>
               <div className="space-y-4">
                 <button
                   onClick={() => handleModeSelect('mini')}
-                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
                 >
                   Play Mini Game (10 Questions, 20s Timer)
                 </button>
                 <button
                   onClick={() => handleModeSelect('full')}
-                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
                 >
                   Play Full Game (20 Questions, No Timer)
                 </button>
               </div>
               <button
                 onClick={() => setGameState('mainMenu')}
-                className="w-full bg-gray-200 dark:bg-gray-700 py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors mt-4"
+                className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
               >
                 🪴 Back to Main Menu
               </button>
@@ -549,14 +557,14 @@
           {gameState === 'nameInput' && (
             <div>
               <h1 className="text-3xl font-bold mb-4 text-amber-600">Wedding Trivia Game</h1>
-              <p className="text-lg mb-6 text-gray-900 dark:text-gray-100">Enter your name to start the {gameMode === 'mini' ? 'Mini' : 'Full'} Game!</p>
+              <p className="text-lg mb-6">Enter your name to start the {gameMode === 'mini' ? 'Mini' : 'Full'} Game!</p>
               <form onSubmit={handleNameSubmit} className="space-y-4">
                 <input
                   type="text"
                   placeholder="First Name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full p-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  className={`w-full p-2 border rounded-lg ${darkMode ? 'bg-gray-700 text-gray-100' : 'bg-white text-gray-900'}`}
                   required
                 />
                 <input
@@ -564,25 +572,25 @@
                   placeholder="Last Name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full p-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  className={`w-full p-2 border rounded-lg ${darkMode ? 'bg-gray-700 text-gray-100' : 'bg-white text-gray-900'}`}
                   required
                 />
                 <button
                   type="submit"
-                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
                 >
                   Start Game
                 </button>
                 <button
                   onClick={() => setGameState('playGame')}
-                  className="w-full bg-gray-200 dark:bg-gray-700 py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   Back to Play Game
                 </button>
               </form>
               <button
                 onClick={() => setGameState('mainMenu')}
-                className="w-full bg-gray-200 dark:bg-gray-700 py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors mt-4"
+                className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
               >
                 🪴 Back to Main Menu
               </button>
@@ -592,21 +600,21 @@
           {gameState === 'playing' && questions.length > 0 && (
             <div>
               <h1 className="text-3xl font-bold mb-4 text-amber-600">Wedding Trivia Game</h1>
-              <p className="text-lg mb-6 text-gray-900 dark:text-gray-100">Welcome, {firstName} {lastName}!</p>
+              <p className="text-lg mb-6">Welcome, {firstName} {lastName}!</p>
               {gameMode === 'mini' && (
                 <p className="text-md mb-4 text-red-600">Time left: {timer}s</p>
               )}
-              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+              <h2 className="text-xl font-semibold mb-4">
                 Question {currentQuestion + 1} of {questions.length}
               </h2>
-              <p className="text-lg mb-6 text-gray-900 dark:text-gray-100">{questions[currentQuestion].question}</p>
+              <p className="text-lg mb-6">{questions[currentQuestion].question}</p>
               <div className="space-y-4">
                 {shuffledOptions[currentQuestion]?.map((option, index) => (
                   <button
                     key={index}
                     onClick={() => handleAnswer(option)}
                     disabled={selectedOption !== null || answered || (gameMode === 'mini' && timer === 0)}
-                    className="w-full py-2 px-4 rounded-lg text-left transition-colors bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:cursor-not-allowed text-gray-900 dark:text-gray-100"
+                    className={`w-full py-2 px-4 rounded-lg text-left transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600 disabled:bg-gray-700' : 'bg-gray-200 hover:bg-gray-300 disabled:bg-gray-200'} disabled:cursor-not-allowed`}
                   >
                     {option}
                   </button>
@@ -617,14 +625,14 @@
 
           {gameState === 'result' && (
             <div>
-              <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Game Over, {firstName} {lastName}!</h2>
-              <p className="text-lg mb-6 text-gray-900 dark:text-gray-100">
+              <h2 className="text-2xl font-semibold mb-4">Game Over, {firstName} {lastName}!</h2>
+              <p className="text-lg mb-6">
                 You scored {score} out of {questions.length}!
               </p>
-              <p className="text-md mb-6 text-gray-900 dark:text-gray-100">
+              <p className="text-md mb-6">
                 Completed in {Math.round(totalTime)} seconds!
               </p>
-              <p className="text-md mb-6 text-gray-900 dark:text-gray-100">
+              <p className="text-md mb-6">
                 {score === questions.length
                   ? "Perfect! You're a true expert on the couple!"
                   : score >= questions.length / 2
@@ -634,26 +642,26 @@
               <div className="space-y-4 mb-6">
                 <button
                   onClick={() => setLeaderboardType('mini')}
-                  className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'mini' ? 'bg-amber-600 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
+                  className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'mini' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                 >
                   View Mini Game Leaderboard
                 </button>
                 <button
                   onClick={() => setLeaderboardType('full')}
-                  className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'full' ? 'bg-amber-600 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
+                  className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'full' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                 >
                   View Full Game Leaderboard
                 </button>
                 <div className="space-x-4">
                   <button
                     onClick={() => setLeaderboardView('top5')}
-                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                   >
                     Top 5
                   </button>
                   <button
                     onClick={() => setLeaderboardView('all')}
-                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                   >
                     All
                   </button>
@@ -662,7 +670,7 @@
               {renderLeaderboards()}
               <button
                 onClick={() => setGameState('mainMenu')}
-                className="w-full bg-gray-200 dark:bg-gray-700 py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors mt-4"
+                className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
               >
                 🪴 Back to Main Menu
               </button>
