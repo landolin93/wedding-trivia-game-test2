@@ -83,7 +83,7 @@
       },
       {
         question: "What color is the couple’s wedding theme?",
-        options: ["Blue", "Pink", "Gold", "Green"],
+        options: ["Blue", "Pink", "，金", "Green"],
         correct: "Pink"
       },
       {
@@ -147,6 +147,352 @@
       const [gameState, setGameState] = React.useState('modeSelect');
       const [firstName, setFirstName] = React.useState('');
       const [lastName, setLastName] = React.useState('');
- saving scores, checking entries) are logged to the console. Consider adding user-facing error messages for a better experience.
+      const [gameMode, setGameMode] = React.useState(null); // 'mini' or 'full'
+      const [currentQuestion, setCurrentQuestion] = React.useState(0);
+      const [score, setScore] = React.useState(0);
+      const [selectedOption, setSelectedOption] = React.useState(null);
+      const [questions, setQuestions] = React.useState([]);
+      const [shuffledOptions, setShuffledOptions] = React.useState([]);
+      const [timer, setTimer] = React.useState(20);
+      const [answered, setAnswered] = React.useState(false);
+      const [totalTime, setTotalTime] = React.useState(0);
+      const [miniLeaderboard, setMiniLeaderboard] = React.useState([]);
+      const [fullLeaderboard, setFullLeaderboard] = React.useState([]);
+      const [leaderboardView, setLeaderboardView] = React.useState('top5'); // 'top5', 'top25', 'all'
 
-- **Performance**: The CDN-based setup is fine for development, but for production, use a bundler (e.g., Vite) to optimize loading times.
+      // Fetch leaderboards
+      React.useEffect(() => {
+        // Mini game leaderboard
+        const miniUnsubscribe = db.collection('miniLeaderboard')
+          .orderBy('score', 'desc')
+          .orderBy('completionTime', 'asc')
+          .onSnapshot((snapshot) => {
+            const leaderboardData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setMiniLeaderboard(leaderboardData);
+          }, (error) => {
+            console.error('Error fetching mini leaderboard:', error);
+          });
+
+        // Full game leaderboard
+        const fullUnsubscribe = db.collection('fullLeaderboard')
+          .orderBy('score', 'desc')
+          .orderBy('completionTime', 'asc')
+          .onSnapshot((snapshot) => {
+            const leaderboardData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setFullLeaderboard(leaderboardData);
+          }, (error) => {
+            console.error('Error fetching full leaderboard:', error);
+          });
+
+        return () => {
+          miniUnsubscribe();
+          fullUnsubscribe();
+        };
+      }, []);
+
+      // Initialize questions and options
+      React.useEffect(() => {
+        if (gameState === 'playing' && questions.length === 0) {
+          const questionCount = gameMode === 'mini' ? 10 : allQuestions.length;
+          const shuffledQuestions = shuffle(allQuestions).slice(0, questionCount);
+          setQuestions(shuffledQuestions);
+          setShuffledOptions(shuffledQuestions.map(q => shuffle(q.options)));
+        }
+      }, [gameState, gameMode]);
+
+      // Update options when question changes
+      React.useEffect(() => {
+        if (gameState === 'playing' && questions.length > 0 && currentQuestion < questions.length) {
+          setShuffledOptions(prev => {
+            const newOptions = [...prev];
+            newOptions[currentQuestion] = shuffle(questions[currentQuestion].options);
+            return newOptions;
+          });
+          setTimer(20);
+          setAnswered(false);
+          setSelectedOption(null);
+        }
+      }, [currentQuestion, questions]);
+
+      // Timer logic
+      React.useEffect(() => {
+        if (gameState === 'playing' && !answered && timer > 0) {
+          const interval = setInterval(() => {
+            setTimer((prev) => {
+              if (prev <= 1) {
+                clearInterval(interval);
+                handleTimeout();
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+          return () => clearInterval(interval);
+        }
+      }, [timer, gameState, answered]);
+
+      const handleModeSelect = (mode) => {
+        setGameMode(mode);
+        setGameState('nameInput');
+      };
+
+      const handleNameSubmit = (e) => {
+        e.preventDefault();
+        if (firstName.trim() && lastName.trim()) {
+          setGameState('playing');
+        } else {
+          alert('Please enter both first and last name.');
+        }
+      };
+
+      const handleTimeout = () => {
+        const timeSpent = 20;
+        setTotalTime(prev => prev + timeSpent);
+        if (currentQuestion + 1 < questions.length) {
+          setCurrentQuestion(currentQuestion + 1);
+        } else {
+          saveScoreAndCheckEntries();
+          setGameState('result');
+        }
+      };
+
+      const handleAnswer = (option) => {
+        if (timer === 0) return;
+        setSelectedOption(option);
+        setAnswered(true);
+        const timeSpent = 20 - timer;
+        setTotalTime(prev => prev + timeSpent);
+        if (option === questions[currentQuestion].correct) {
+          setScore(score + 1);
+        }
+        setTimeout(() => {
+          if (currentQuestion + 1 < questions.length) {
+            setCurrentQuestion(currentQuestion + 1);
+          } else {
+            const finalScore = score + (option === questions[currentQuestion].correct ? 1 : 0);
+            saveScoreAndCheckEntries(finalScore);
+            setGameState('result');
+          }
+        }, 1000);
+      };
+
+      const saveScoreAndCheckEntries = (finalScore = score) => {
+        const leaderboardCollection = gameMode === 'mini' ? 'miniLeaderboard' : 'fullLeaderboard';
+        const playerName = `${firstName} ${lastName}`;
+
+        // Save new score
+        db.collection(leaderboardCollection)
+          .add({
+            name: playerName,
+            score: finalScore,
+            completionTime: totalTime + (20 - timer),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          })
+          .then(() => {
+            // Check for multiple entries
+            db.collection(leaderboardCollection)
+              .where('name', '==', playerName)
+              .orderBy('score', 'asc')
+              .get()
+              .then((snapshot) => {
+                const entries = snapshot.docs;
+                if (entries.length > 2) {
+                  // Delete the lowest score
+                  db.collection(leaderboardCollection)
+                    .doc(entries[0].id)
+                    .delete()
+                    .catch(error => console.error('Error deleting lowest score:', error));
+                }
+              })
+              .catch(error => console.error('Error checking entries:', error));
+          })
+          .catch(error => console.error('Error saving score:', error));
+      };
+
+      const restartGame = () => {
+        setGameState('modeSelect');
+        setFirstName('');
+        setLastName('');
+        setGameMode(null);
+        setCurrentQuestion(0);
+        setScore(0);
+        setSelectedOption(null);
+        setQuestions([]);
+        setShuffledOptions([]);
+        setTimer(20);
+        setAnswered(false);
+        setTotalTime(0);
+        setLeaderboardView('top5');
+      };
+
+      const renderLeaderboards = () => {
+        const maxEntries = leaderboardView === 'top5' ? 5 : leaderboardView === 'top25' ? 25 : Infinity;
+
+        return (
+          <div>
+            <h3 className="text-xl font-semibold mb-4">Mini Game Leaderboard</h3>
+            <ul className="text-lg mb-6 space-y-2">
+              {miniLeaderboard.length > 0 ? (
+                miniLeaderboard.slice(0, maxEntries).map((entry, index) => (
+                  <li key={index}>
+                    {index + 1}. {entry.name}: {entry.score}/10
+                  </li>
+                ))
+              ) : (
+                <li>No scores yet!</li>
+              )}
+            </ul>
+            <h3 className="text-xl font-semibold mb-4">Full Game Leaderboard</h3>
+            <ul className="text-lg mb-6 space-y-2">
+              {fullLeaderboard.length > 0 ? (
+                fullLeaderboard.slice(0, maxEntries).map((entry, index) => (
+                  <li key={index}>
+                    {index + 1}. {entry.name}: {entry.score}/20
+                  </li>
+                ))
+              ) : (
+                <li>No scores yet!</li>
+              )}
+            </ul>
+            <div className="space-x-4">
+              <button
+                onClick={() => setLeaderboardView('top5')}
+                className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-pink-600 text-white' : 'bg-gray-200'}`}
+              >
+                Top 5
+              </button>
+              <button
+                onClick={() => setLeaderboardView('top25')}
+                className={`py-2 px-4 rounded-lg ${leaderboardView === 'top25' ? 'bg-pink-600 text-white' : 'bg-gray-200'}`}
+              >
+                Top 25
+              </button>
+              <button
+                onClick={() => setLeaderboardView('all')}
+                className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-pink-600 text-white' : 'bg-gray-200'}`}
+              >
+                All
+              </button>
+            </div>
+          </div>
+        );
+      };
+
+      return (
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full text-center">
+          {gameState === 'modeSelect' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4 text-pink-600">Wedding Trivia Game</h1>
+              <p className="text-lg mb-6">Choose your game mode!</p>
+              {renderLeaderboards()}
+              <div className="space-y-4 mt-6">
+                <button
+                  onClick={() => handleModeSelect('mini')}
+                  className="w-full bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors"
+                >
+                  Play Mini Game (10 Questions)
+                </button>
+                <button
+                  onClick={() => handleModeSelect('full')}
+                  className="w-full bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors"
+                >
+                  Play Full Game (20 Questions)
+                </button>
+              </div>
+            </div>
+          )}
+
+          {gameState === 'nameInput' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4 text-pink-600">Wedding Trivia Game</h1>
+              <p className="text-lg mb-6">Enter your name to start the {gameMode === 'mini' ? 'Mini' : 'Full'} Game!</p>
+              <form onSubmit={handleNameSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors"
+                >
+                  Start Game
+                </button>
+              </form>
+            </div>
+          )}
+
+          {gameState === 'playing' && questions.length > 0 && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4 text-pink-600">Wedding Trivia Game</h1>
+              <p className="text-lg mb-6">Welcome, {firstName} {lastName}!</p>
+              <p className="text-md mb-4 text-red-600">Time left: {timer}s</p>
+              <h2 className="text-xl font-semibold mb-4">
+                Question {currentQuestion + 1} of {questions.length}
+              </h2>
+              <p className="text-lg mb-6">{questions[currentQuestion].question}</p>
+              <div className="space-y-4">
+                {shuffledOptions[currentQuestion]?.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleAnswer(option)}
+                    disabled={selectedOption !== null || answered || timer === 0}
+                    className={`w-full py-2 px-4 rounded-lg text-left transition-colors ${
+                      selectedOption === option
+                        ? 'bg-gray-300'
+                        : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {gameState === 'result' && (
+            <div>
+              <h2 className="text-2xl font-semibold mb-4">Game Over, {firstName} {lastName}!</h2>
+              <p className="text-lg mb-6">
+                You scored {score} out of {questions.length}!
+              </p>
+              <p className="text-md mb-6">
+                Completed in {totalTime} seconds!
+              </p>
+              <p className="text-md mb-6">
+                {score === questions.length
+                  ? "Perfect! You're a true expert on the couple!"
+                  : score >= questions.length / 2
+                  ? "Great job! You know the couple well!"
+                  : "Nice try! Maybe chat with the couple more!"}
+              </p>
+              {renderLeaderboards()}
+              <button
+                onClick={restartGame}
+                className="bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors mt-6"
+              >
+                Play Again
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const rootElement = document.getElementById('root');
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(<TriviaGame />);
+  </script>
+</body>
+</html>
