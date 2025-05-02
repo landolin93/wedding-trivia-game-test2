@@ -150,32 +150,66 @@
       const [currentQuestion, setCurrentQuestion] = React.useState(0);
       const [score, setScore] = React.useState(0);
       const [selectedOption, setSelectedOption] = React.useState(null);
-      const [leaderboard, setLeaderboard] = React.useState([]);
       const [questions, setQuestions] = React.useState([]);
+      const [shuffledOptions, setShuffledOptions] = React.useState([]);
       const [timer, setTimer] = React.useState(20);
       const [answered, setAnswered] = React.useState(false);
+      const [scoreLeaderboard, setScoreLeaderboard] = React.useState([]);
+      const [timeLeaderboard, setTimeLeaderboard] = React.useState([]);
+      const [totalTime, setTotalTime] = React.useState(0);
 
-      // Fetch leaderboard
+      // Fetch leaderboards
       React.useEffect(() => {
-        const unsubscribe = db.collection('leaderboard')
+        // Score leaderboard
+        const scoreUnsubscribe = db.collection('leaderboard')
           .orderBy('score', 'desc')
-          .limit(5)
+          .limit(25)
           .onSnapshot((snapshot) => {
             const leaderboardData = snapshot.docs.map(doc => doc.data());
-            setLeaderboard(leaderboardData);
+            setScoreLeaderboard(leaderboardData);
           }, (error) => {
-            console.error('Error fetching leaderboard:', error);
+            console.error('Error fetching score leaderboard:', error);
           });
-        return () => unsubscribe();
+
+        // Time leaderboard
+        const timeUnsubscribe = db.collection('leaderboard')
+          .orderBy('completionTime', 'asc')
+          .limit(25)
+          .onSnapshot((snapshot) => {
+            const leaderboardData = snapshot.docs.map(doc => doc.data());
+            setTimeLeaderboard(leaderboardData);
+          }, (error) => {
+            console.error('Error fetching time leaderboard:', error);
+          });
+
+        return () => {
+          scoreUnsubscribe();
+          timeUnsubscribe();
+        };
       }, []);
 
-      // Initialize questions and timer
+      // Initialize questions and options
       React.useEffect(() => {
         if (gameState === 'playing' && questions.length === 0) {
           const shuffledQuestions = shuffle(allQuestions).slice(0, 10);
           setQuestions(shuffledQuestions);
+          setShuffledOptions(shuffledQuestions.map(q => shuffle(q.options)));
         }
       }, [gameState]);
+
+      // Update options when question changes
+      React.useEffect(() => {
+        if (gameState === 'playing' && questions.length > 0 && currentQuestion < questions.length) {
+          setShuffledOptions(prev => {
+            const newOptions = [...prev];
+            newOptions[currentQuestion] = shuffle(questions[currentQuestion].options);
+            return newOptions;
+          });
+          setTimer(20);
+          setAnswered(false);
+          setSelectedOption(null);
+        }
+      }, [currentQuestion, questions]);
 
       // Timer logic
       React.useEffect(() => {
@@ -199,16 +233,16 @@
       };
 
       const handleTimeout = () => {
+        const timeSpent = 20; // Full 20 seconds for timeout
+        setTotalTime(prev => prev + timeSpent);
         if (currentQuestion + 1 < questions.length) {
           setCurrentQuestion(currentQuestion + 1);
-          setTimer(20);
-          setAnswered(false);
-          setSelectedOption(null);
         } else {
-          // Save score to Firestore
+          // Save score and time to Firestore
           db.collection('leaderboard').add({
             name: `${firstName} ${lastName}`,
             score: score,
+            completionTime: totalTime + timeSpent,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
           }).catch(error => console.error('Error saving score:', error));
           setGameState('result');
@@ -218,20 +252,21 @@
       const handleAnswer = (option) => {
         setSelectedOption(option);
         setAnswered(true);
+        const timeSpent = 20 - timer;
+        setTotalTime(prev => prev + timeSpent);
         if (option === questions[currentQuestion].correct) {
           setScore(score + 1);
         }
         setTimeout(() => {
           if (currentQuestion + 1 < questions.length) {
             setCurrentQuestion(currentQuestion + 1);
-            setTimer(20);
-            setAnswered(false);
-            setSelectedOption(null);
           } else {
-            // Save score to Firestore
+            // Save score and time to Firestore
+            const finalScore = score + (option === questions[currentQuestion].correct ? 1 : 0);
             db.collection('leaderboard').add({
               name: `${firstName} ${lastName}`,
-              score: score + (option === questions[currentQuestion].correct ? 1 : 0),
+              score: finalScore,
+              completionTime: totalTime + timeSpent,
               timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).catch(error => console.error('Error saving score:', error));
             setGameState('result');
@@ -247,12 +282,11 @@
         setScore(0);
         setSelectedOption(null);
         setQuestions([]);
+        setShuffledOptions([]);
         setTimer(20);
         setAnswered(false);
+        setTotalTime(0);
       };
-
-      // Randomize options for current question
-      const randomizedOptions = questions.length > 0 ? shuffle(questions[currentQuestion].options) : [];
 
       return (
         <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full text-center">
@@ -297,7 +331,7 @@
               </h2>
               <p className="text-lg mb-6">{questions[currentQuestion].question}</p>
               <div className="space-y-4">
-                {randomizedOptions.map((option, index) => (
+                {shuffledOptions[currentQuestion]?.map((option, index) => (
                   <button
                     key={index}
                     onClick={() => handleAnswer(option)}
@@ -322,22 +356,37 @@
                 You scored {score} out of {questions.length}!
               </p>
               <p className="text-md mb-6">
+                Completed in {totalTime} seconds!
+              </p>
+              <p className="text-md mb-6">
                 {score === questions.length
                   ? "Perfect! You're a true expert on the couple!"
                   : score >= questions.length / 2
                   ? "Great job! You know the couple well!"
                   : "Nice try! Maybe chat with the couple more!"}
               </p>
-              <h3 className="text-xl font-semibold mb-4">Global Leaderboard</h3>
+              <h3 className="text-xl font-semibold mb-4">Score Leaderboard</h3>
               <ul className="text-lg mb-6 space-y-2">
-                {leaderboard.length > 0 ? (
-                  leaderboard.map((entry, index) => (
+                {scoreLeaderboard.length > 0 ? (
+                  scoreLeaderboard.map((entry, index) => (
                     <li key={index}>
                       {index + 1}. {entry.name}: {entry.score}/10
                     </li>
                   ))
                 ) : (
                   <li>No scores yet!</li>
+                )}
+              </ul>
+              <h3 className="text-xl font-semibold mb-4">Fastest Time Leaderboard</h3>
+              <ul className="text-lg mb-6 space-y-2">
+                {timeLeaderboard.length > 0 ? (
+                  timeLeaderboard.map((entry, index) => (
+                    <li key={index}>
+                      {index + 1}. {entry.name}: {entry.completionTime}s
+                    </li>
+                  ))
+                ) : (
+                  <li>No times yet!</li>
                 )}
               </ul>
               <button
