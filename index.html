@@ -23,7 +23,7 @@
       projectId: "wedding-trivia-test",
       storageBucket: "wedding-trivia-test.firebasestorage.app",
       messagingSenderId: "423493222722",
-      appId: "1 | 423493222722 | web | 0968dce8350c3ee8d4c8db",
+      appId: "1:423493222722:web:0968dce8350c3ee8d4c8db",
       measurementId: "G-LDT4H0GPFG"
     };
     firebase.initializeApp(firebaseConfig);
@@ -147,7 +147,7 @@
       const [gameState, setGameState] = React.useState('modeSelect');
       const [firstName, setFirstName] = React.useState('');
       const [lastName, setLastName] = React.useState('');
-      const [gameMode, setGameMode] = React.useState(null); // 'mini' or 'full'
+      const [gameMode, setGameMode] = React.useState(null);
       const [currentQuestion, setCurrentQuestion] = React.useState(0);
       const [score, setScore] = React.useState(0);
       const [selectedOption, setSelectedOption] = React.useState(null);
@@ -158,14 +158,15 @@
       const [totalTime, setTotalTime] = React.useState(0);
       const [miniLeaderboard, setMiniLeaderboard] = React.useState([]);
       const [fullLeaderboard, setFullLeaderboard] = React.useState([]);
-      const [leaderboardView, setLeaderboardView] = React.useState('top5'); // 'top5', 'top25', 'all'
+      const [leaderboardType, setLeaderboardType] = React.useState('mini');
+      const [leaderboardView, setLeaderboardView] = React.useState('top5');
       const [leaderboardError, setLeaderboardError] = React.useState(null);
       const [isLoading, setIsLoading] = React.useState(true);
+      const [questionStartTime, setQuestionStartTime] = React.useState(null);
 
       // Fetch leaderboards
       React.useEffect(() => {
         setIsLoading(true);
-        // Mini game leaderboard
         const miniUnsubscribe = db.collection('miniLeaderboard')
           .orderBy('score', 'desc')
           .orderBy('completionTime', 'asc')
@@ -180,7 +181,6 @@
             setIsLoading(false);
           });
 
-        // Full game leaderboard
         const fullUnsubscribe = db.collection('fullLeaderboard')
           .orderBy('score', 'desc')
           .orderBy('completionTime', 'asc')
@@ -208,39 +208,21 @@
           const shuffledQuestions = shuffle(allQuestions).slice(0, questionCount);
           setQuestions(shuffledQuestions);
           setShuffledOptions(shuffledQuestions.map(q => shuffle(q.options)));
+          setQuestionStartTime(performance.now());
         }
       }, [gameState, gameMode]);
 
-      // Update options when question changes
+      // Timer logic for Mini Game only
       React.useEffect(() => {
-        if (gameState === 'playing' && questions.length > 0 && currentQuestion < questions.length) {
-          setShuffledOptions(prev => {
-            const newOptions = [...prev];
-            newOptions[currentQuestion] = shuffle(questions[currentQuestion].options);
-            return newOptions;
-          });
-          setTimer(20);
-          setAnswered(false);
-          setSelectedOption(null);
-        }
-      }, [currentQuestion, questions]);
-
-      // Timer logic
-      React.useEffect(() => {
-        if (gameState === 'playing' && !answered && timer > 0) {
+        if (gameState === 'playing' && gameMode === 'mini' && !answered && timer > 0) {
           const interval = setInterval(() => {
-            setTimer((prev) => {
-              if (prev <= 1) {
-                clearInterval(interval);
-                handleTimeout();
-                return 0;
-              }
-              return prev - 1;
-            });
+            setTimer(prev => prev - 1);
           }, 1000);
           return () => clearInterval(interval);
+        } else if (gameMode === 'mini' && timer === 0 && !answered) {
+          handleTimeout();
         }
-      }, [timer, gameState, answered]);
+      }, [timer, gameState, answered, gameMode]);
 
       const handleModeSelect = (mode) => {
         setGameMode(mode);
@@ -261,6 +243,10 @@
         setTotalTime(prev => prev + timeSpent);
         if (currentQuestion + 1 < questions.length) {
           setCurrentQuestion(currentQuestion + 1);
+          setTimer(20);
+          setAnswered(false);
+          setSelectedOption(null);
+          setQuestionStartTime(performance.now());
         } else {
           saveScoreAndCheckEntries();
           setGameState('result');
@@ -268,10 +254,10 @@
       };
 
       const handleAnswer = (option) => {
-        if (timer === 0) return;
+        if (gameMode === 'mini' && timer === 0) return;
         setSelectedOption(option);
         setAnswered(true);
-        const timeSpent = 20 - timer;
+        const timeSpent = gameMode === 'mini' ? 20 - timer : (performance.now() - questionStartTime) / 1000;
         setTotalTime(prev => prev + timeSpent);
         if (option === questions[currentQuestion].correct) {
           setScore(score + 1);
@@ -279,6 +265,10 @@
         setTimeout(() => {
           if (currentQuestion + 1 < questions.length) {
             setCurrentQuestion(currentQuestion + 1);
+            setTimer(gameMode === 'mini' ? 20 : 0);
+            setAnswered(false);
+            setSelectedOption(null);
+            setQuestionStartTime(performance.now());
           } else {
             const finalScore = score + (option === questions[currentQuestion].correct ? 1 : 0);
             saveScoreAndCheckEntries(finalScore);
@@ -291,16 +281,13 @@
         const leaderboardCollection = gameMode === 'mini' ? 'miniLeaderboard' : 'fullLeaderboard';
         const playerName = `${firstName} ${lastName}`;
 
-        // Save new score
         db.collection(leaderboardCollection)
           .add({
             name: playerName,
             score: finalScore,
-            completionTime: totalTime + (20 - timer),
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            completionTime: totalTime + (gameMode === 'mini' ? (20 - timer) : (performance.now() - questionStartTime) / 1000),
           })
           .then(() => {
-            // Check for multiple entries
             db.collection(leaderboardCollection)
               .where('name', '==', playerName)
               .orderBy('score', 'asc')
@@ -308,7 +295,6 @@
               .then((snapshot) => {
                 const entries = snapshot.docs;
                 if (entries.length > 2) {
-                  // Delete the lowest score
                   db.collection(leaderboardCollection)
                     .doc(entries[0].id)
                     .delete()
@@ -333,44 +319,41 @@
         setTimer(20);
         setAnswered(false);
         setTotalTime(0);
+        setLeaderboardType('mini');
         setLeaderboardView('top5');
         setLeaderboardError(null);
+        setQuestionStartTime(null);
       };
 
       const renderLeaderboards = () => {
-        const maxEntries = leaderboardView === 'top5' ? 5 : leaderboardView === 'top25' ? 25 : Infinity;
+        const maxEntries = leaderboardView === 'top5' ? 5 : Infinity;
+        const leaderboard = leaderboardType === 'mini' ? miniLeaderboard : fullLeaderboard;
+        const leaderboardTitle = leaderboardType === 'mini' ? 'Mini Game Leaderboard' : 'Full Game Leaderboard';
+        const maxScore = leaderboardType === 'mini' ? 10 : 20;
+
+        // Filter to show only the highest score per player
+        const uniqueLeaderboard = Object.values(
+          leaderboard.reduce((acc, entry) => {
+            if (!acc[entry.name] || entry.score > acc[entry.name].score) {
+              acc[entry.name] = entry;
+            }
+            return acc;
+          }, {})
+        ).sort((a, b) => b.score - a.score || a.completionTime - b.completionTime);
 
         return (
           <div>
-            <h3 className="text-xl font-semibold mb-4">Mini Game Leaderboard</h3>
+            <h3 className="text-xl font-semibold mb-4">{leaderboardTitle}</h3>
             {isLoading ? (
               <p className="text-lg mb-6">Loading leaderboard...</p>
             ) : leaderboardError ? (
               <p className="text-lg mb-6 text-red-600">{leaderboardError}</p>
             ) : (
               <ul className="text-lg mb-6 space-y-2">
-                {miniLeaderboard.length > 0 ? (
-                  miniLeaderboard.slice(0, maxEntries).map((entry, index) => (
+                {uniqueLeaderboard.length > 0 ? (
+                  uniqueLeaderboard.slice(0, maxEntries).map((entry, index) => (
                     <li key={index}>
-                      {index + 1}. {entry.name}: {entry.score}/10
-                    </li>
-                  ))
-                ) : (
-                  <li>No scores yet!</li>
-                )}
-              </ul>
-            )}
-            <h3 className="text-xl font-semibold mb-4">Full Game Leaderboard</h3>
-            {isLoading ? (
-              <p className="text-lg mb-6">Loading leaderboard...</p>
-            ) : leaderboardError ? (
-              <p className="text-lg mb-6 text-red-600">{leaderboardError}</p>
-            ) : (
-              <ul className="text-lg mb-6 space-y-2">
-                {fullLeaderboard.length > 0 ? (
-                  fullLeaderboard.slice(0, maxEntries).map((entry, index) => (
-                    <li key={index}>
-                      {index + 1}. {entry.name}: {entry.score}/20
+                      {index + 1}. {entry.name}: {entry.score}/{maxScore}, {Math.round(entry.completionTime)}s
                     </li>
                   ))
                 ) : (
@@ -384,12 +367,6 @@
                 className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-pink-600 text-white' : 'bg-gray-200'}`}
               >
                 Top 5
-              </button>
-              <button
-                onClick={() => setLeaderboardView('top25')}
-                className={`py-2 px-4 rounded-lg ${leaderboardView === 'top25' ? 'bg-pink-600 text-white' : 'bg-gray-200'}`}
-              >
-                Top 25
               </button>
               <button
                 onClick={() => setLeaderboardView('all')}
@@ -407,20 +384,34 @@
           {gameState === 'modeSelect' && (
             <div>
               <h1 className="text-3xl font-bold mb-4 text-pink-600">Wedding Trivia Game</h1>
-              <p className="text-lg mb-6">Choose your game mode!</p>
+              <p className="text-lg mb-6">Choose your game mode or view leaderboards!</p>
+              <div className="space-y-4 mb-6">
+                <button
+                  onClick={() => setLeaderboardType('mini')}
+                  className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  View Mini Game Leaderboard
+                </button>
+                <button
+                  onClick={() => setLeaderboardType('full')}
+                  className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  View Full Game Leaderboard
+                </button>
+              </div>
               {renderLeaderboards()}
               <div className="space-y-4 mt-6">
                 <button
                   onClick={() => handleModeSelect('mini')}
                   className="w-full bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors"
                 >
-                  Play Mini Game (10 Questions)
+                  Play Mini Game (10 Questions, 20s Timer)
                 </button>
                 <button
                   onClick={() => handleModeSelect('full')}
                   className="w-full bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors"
                 >
-                  Play Full Game (20 Questions)
+                  Play Full Game (20 Questions, No Timer)
                 </button>
               </div>
             </div>
@@ -461,7 +452,9 @@
             <div>
               <h1 className="text-3xl font-bold mb-4 text-pink-600">Wedding Trivia Game</h1>
               <p className="text-lg mb-6">Welcome, {firstName} {lastName}!</p>
-              <p className="text-md mb-4 text-red-600">Time left: {timer}s</p>
+              {gameMode === 'mini' && (
+                <p className="text-md mb-4 text-red-600">Time left: {timer}s</p>
+              )}
               <h2 className="text-xl font-semibold mb-4">
                 Question {currentQuestion + 1} of {questions.length}
               </h2>
@@ -471,12 +464,8 @@
                   <button
                     key={index}
                     onClick={() => handleAnswer(option)}
-                    disabled={selectedOption !== null || answered || timer === 0}
-                    className={`w-full py-2 px-4 rounded-lg text-left transition-colors ${
-                      selectedOption === option
-                        ? 'bg-gray-300'
-                        : 'bg-gray-200 hover:bg-gray-300'
-                    }`}
+                    disabled={selectedOption !== null || answered || (gameMode === 'mini' && timer === 0)}
+                    className="w-full py-2 px-4 rounded-lg text-left transition-colors bg-gray-200 hover:bg-gray-300 disabled:bg-gray-200 disabled:cursor-not-allowed"
                   >
                     {option}
                   </button>
@@ -492,7 +481,7 @@
                 You scored {score} out of {questions.length}!
               </p>
               <p className="text-md mb-6">
-                Completed in {totalTime} seconds!
+                Completed in {Math.round(totalTime)} seconds!
               </p>
               <p className="text-md mb-6">
                 {score === questions.length
@@ -501,6 +490,20 @@
                   ? "Great job! You know the couple well!"
                   : "Nice try! Maybe chat with the couple more!"}
               </p>
+              <div className="space-y-4 mb-6">
+                <button
+                  onClick={() => setLeaderboardType('mini')}
+                  className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  View Mini Game Leaderboard
+                </button>
+                <button
+                  onClick={() => setLeaderboardType('full')}
+                  className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  View Full Game Leaderboard
+                </button>
+              </div>
               {renderLeaderboards()}
               <button
                 onClick={restartGame}
