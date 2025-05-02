@@ -37,10 +37,24 @@
     ];
 
     function TriviaGame() {
+      const [gameState, setGameState] = React.useState('nameInput'); // nameInput, playing, result
+      const [firstName, setFirstName] = React.useState('');
+      const [lastName, setLastName] = React.useState('');
       const [currentQuestion, setCurrentQuestion] = React.useState(0);
       const [score, setScore] = React.useState(0);
-      const [showResult, setShowResult] = React.useState(false);
       const [selectedOption, setSelectedOption] = React.useState(null);
+      const [leaderboard, setLeaderboard] = React.useState(
+        JSON.parse(localStorage.getItem('leaderboard')) || []
+      );
+
+      const handleNameSubmit = (e) => {
+        e.preventDefault();
+        if (firstName.trim() && lastName.trim()) {
+          setGameState('playing');
+        } else {
+          alert('Please enter both first and last name.');
+        }
+      };
 
       const handleAnswer = (option) => {
         setSelectedOption(option);
@@ -52,25 +66,67 @@
             setCurrentQuestion(currentQuestion + 1);
             setSelectedOption(null);
           } else {
-            setShowResult(true);
+            // Save score to leaderboard
+            const newEntry = {
+              name: `${firstName} ${lastName}`,
+              score: score + (option === questions[currentQuestion].correct ? 1 : 0)
+            };
+            const updatedLeaderboard = [...leaderboard, newEntry]
+              .sort((a, b) => b.score - a.score)
+              .slice(0, 5); // Keep top 5
+            setLeaderboard(updatedLeaderboard);
+            localStorage.setItem('leaderboard', JSON.stringify(updatedLeaderboard));
+            setGameState('result');
           }
         }, 1000);
       };
 
       const restartGame = () => {
+        setGameState('nameInput');
+        setFirstName('');
+        setLastName('');
         setCurrentQuestion(0);
         setScore(0);
-        setShowResult(false);
         setSelectedOption(null);
       };
 
       return (
         <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full text-center">
-          <h1 className="text-3xl font-bold mb-4 text-pink-600">Wedding Trivia Game</h1>
-          <p className="text-lg mb-6">Test your knowledge about the happy couple!</p>
-
-          {!showResult ? (
+          {gameState === 'nameInput' && (
             <div>
+              <h1 className="text-3xl font-bold mb-4 text-pink-600">Wedding Trivia Game</h1>
+              <p className="text-lg mb-6">Enter your name to start!</p>
+              <form onSubmit={handleNameSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors"
+                >
+                  Start Game
+                </button>
+              </form>
+            </div>
+          )}
+
+          {gameState === 'playing' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4 text-pink-600">Wedding Trivia Game</h1>
+              <p className="text-lg mb-6">Welcome, {firstName} {lastName}!</p>
               <h2 className="text-xl font-semibold mb-4">
                 Question {currentQuestion + 1} of {questions.length}
               </h2>
@@ -94,9 +150,11 @@
                 ))}
               </div>
             </div>
-          ) : (
+          )}
+
+          {gameState === 'result' && (
             <div>
-              <h2 className="text-2xl font-semibold mb-4">Game Over!</h2>
+              <h2 className="text-2xl font-semibold mb-4">Game Over, {firstName} {lastName}!</h2>
               <p className="text-lg mb-6">
                 You scored {score} out of {questions.length}!
               </p>
@@ -107,6 +165,18 @@
                   ? "Great job! You know the couple well!"
                   : "Nice try! Maybe chat with the couple more!"}
               </p>
+              <h3 className="text-xl font-semibold mb-4">Leaderboard</h3>
+              <ul className="text-lg mb-6 space-y-2">
+                {leaderboard.length > 0 ? (
+                  leaderboard.map((entry, index) => (
+                    <li key={index}>
+                      {index + 1}. {entry.name}: {entry.score}/{questions.length}
+                    </li>
+                  ))
+                ) : (
+                  <li>No scores yet!</li>
+                )}
+              </ul>
               <button
                 onClick={restartGame}
                 className="bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors"
