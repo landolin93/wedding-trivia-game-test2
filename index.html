@@ -7,6 +7,11 @@
   <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    };
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Firebase Compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -173,6 +178,7 @@
       // Toggle dark mode class
       React.useEffect(() => {
         document.documentElement.classList.toggle('dark', darkMode);
+        console.log('Dark mode:', darkMode, 'Class:', document.documentElement.classList.contains('dark'));
       }, [darkMode]);
 
       // Control background music
@@ -394,7 +400,7 @@
             {isLoading ? (
               <p className="text-lg mb-6 text-gray-900 dark:text-gray-100">Loading leaderboard...</p>
             ) : leaderboardError ? (
-              <p className="text-lg mb-6 text-red-600">{MleaderboardError}</p>
+              <p className="text-lg mb-6 text-red-600">{leaderboardError}</p>
             ) : (
               <ul className="text-lg mb-6 space-y-2 text-gray-900 dark:text-gray-100">
                 {uniqueLeaderboard.length > 0 ? (
