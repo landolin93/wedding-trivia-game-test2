@@ -167,11 +167,13 @@
       const [leaderboardError, setLeaderboardError] = React.useState(null);
       const [isLoading, setIsLoading] = React.useState(true);
       const [questionStartTime, setQuestionStartTime] = React.useState(null);
+      const [muted, setMuted] = React.useState(false);
 
       // Control background music
       React.useEffect(() => {
         const audio = document.getElementById('background-music');
         audio.volume = 0.2;
+        audio.muted = muted;
         audio.play().catch(error => {
           console.log('Autoplay prevented:', error);
           const handleInteraction = () => {
@@ -180,7 +182,7 @@
           };
           document.addEventListener('click', handleInteraction);
         });
-      }, []);
+      }, [muted]);
 
       // Fetch leaderboards
       React.useEffect(() => {
@@ -250,7 +252,6 @@
       const handleNameSubmit = (e) => {
         e.preventDefault();
         if (firstName.trim() && lastName.trim()) {
-          // Reset game states before starting
           setCurrentQuestion(0);
           setScore(0);
           setSelectedOption(null);
@@ -277,6 +278,8 @@
           setQuestionStartTime(performance.now());
         } else {
           saveScoreAndCheckEntries();
+          setLeaderboardType(gameMode);
+          setLeaderboardView('top5');
           setGameState('result');
         }
       };
@@ -300,6 +303,8 @@
           } else {
             const finalScore = score + (option === questions[currentQuestion].correct ? 1 : 0);
             saveScoreAndCheckEntries(finalScore);
+            setLeaderboardType(gameMode);
+            setLeaderboardView('top5');
             setGameState('result');
           }
         }, 1000);
@@ -353,13 +358,12 @@
         setQuestionStartTime(null);
       };
 
-      const renderLeaderboards = () => {
+      const renderLeaderboards = React.useCallback(() => {
         const maxEntries = leaderboardView === 'top5' ? 5 : Infinity;
         const leaderboard = leaderboardType === 'mini' ? miniLeaderboard : fullLeaderboard;
         const leaderboardTitle = leaderboardType === 'mini' ? 'Mini Game Leaderboard' : 'Full Game Leaderboard';
         const maxScore = leaderboardType === 'mini' ? 10 : 20;
 
-        // Filter to show only the highest score per player
         const uniqueLeaderboard = Object.values(
           leaderboard.reduce((acc, entry) => {
             if (!acc[entry.name] || entry.score > acc[entry.name].score) {
@@ -391,10 +395,16 @@
             )}
           </div>
         );
-      };
+      }, [leaderboardType, leaderboardView, miniLeaderboard, fullLeaderboard, isLoading, leaderboardError]);
 
       return (
-        <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full text-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full text-center relative">
+          <button
+            onClick={() => setMuted(!muted)}
+            className="absolute top-4 right-4 text-2xl"
+          >
+            {muted ? '🔇' : '🔊'}
+          </button>
           {gameState === 'mainMenu' && (
             <div>
               <h1 className="text-3xl font-bold mb-4 text-amber-600">Wedding Trivia Game</h1>
@@ -595,13 +605,13 @@
               <div className="space-y-4 mb-6">
                 <button
                   onClick={() => setLeaderboardType('mini')}
-                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                  className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'mini' ? 'bg-amber-600 text-white' : 'bg-gray-200'}`}
                 >
                   View Mini Game Leaderboard
                 </button>
                 <button
                   onClick={() => setLeaderboardType('full')}
-                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                  className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'full' ? 'bg-amber-600 text-white' : 'bg-gray-200'}`}
                 >
                   View Full Game Leaderboard
                 </button>
