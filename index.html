@@ -7,17 +7,12 @@
   <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class'
-    };
-  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Firebase Compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-200 font-sans">
   <div id="root" class="min-h-screen flex items-center justify-center"></div>
   <audio id="background-music" loop autoplay>
     <source src="https://landolin93.github.io/wedding-trivia-game-test2/wedding-romantic-182518.mp3" type="audio/mpeg">
@@ -175,18 +170,22 @@
       const [muted, setMuted] = React.useState(false);
       const [darkMode, setDarkMode] = React.useState(false);
 
-      // Toggle dark mode class
+      // Toggle dark mode classes
       React.useEffect(() => {
-        document.documentElement.classList.toggle('dark', darkMode);
+        const body = document.body;
         const root = document.getElementById('root').firstChild;
         if (darkMode) {
+          body.classList.add('bg-gray-700');
+          body.classList.remove('bg-gray-200');
           root.classList.add('bg-gray-800', 'text-gray-100');
           root.classList.remove('bg-white', 'text-gray-900');
         } else {
+          body.classList.add('bg-gray-200');
+          body.classList.remove('bg-gray-700');
           root.classList.add('bg-white', 'text-gray-900');
           root.classList.remove('bg-gray-800', 'text-gray-100');
         }
-        console.log('Dark mode:', darkMode, 'HTML Class:', document.documentElement.classList.contains('dark'), 'Root Classes:', root.classList);
+        console.log('Dark mode:', darkMode, 'Body Classes:', body.classList, 'Root Classes:', root.classList);
       }, [darkMode]);
 
       // Control background music
@@ -213,42 +212,35 @@
         }
       }, [gameState]);
 
-      // Fetch leaderboards
-      React.useEffect(() => {
+      // Fetch leaderboards every 15 seconds
+      const fetchLeaderboards = async () => {
         setIsLoading(true);
-        const miniUnsubscribe = db.collection('miniLeaderboard')
-          .orderBy('score', 'desc')
-          .orderBy('completionTime', 'asc')
-          .onSnapshot((snapshot) => {
-            const leaderboardData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setMiniLeaderboard(leaderboardData);
-            setLeaderboardError(null);
-            setIsLoading(false);
-          }, (error) => {
-            console.error('Error fetching mini leaderboard:', error);
-            setLeaderboardError('Failed to load Mini Game leaderboard.');
-            setIsLoading(false);
-          });
+        try {
+          const miniSnapshot = await db.collection('miniLeaderboard')
+            .orderBy('score', 'desc')
+            .orderBy('completionTime', 'asc')
+            .get();
+          setMiniLeaderboard(miniSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+          const fullSnapshot = await db.collection('fullLeaderboard')
+            .orderBy('score', 'desc')
+            .orderBy('completionTime', 'asc')
+            .get();
+          setFullLeaderboard(fullSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+          setLeaderboardError(null);
+        } catch (error) {
+          console.error('Error fetching leaderboards:', error);
+          setLeaderboardError('Failed to load leaderboards.');
+        }
+        setIsLoading(false);
+      };
 
-        const fullUnsubscribe = db.collection('fullLeaderboard')
-          .orderBy('score', 'desc')
-          .orderBy('completionTime', 'asc')
-          .onSnapshot((snapshot) => {
-            const leaderboardData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setFullLeaderboard(leaderboardData);
-            setLeaderboardError(null);
-            setIsLoading(false);
-          }, (error) => {
-            console.error('Error fetching full leaderboard:', error);
-            setLeaderboardError('Failed to load Full Game leaderboard.');
-            setIsLoading(false);
-          });
-
-        return () => {
-          miniUnsubscribe();
-          fullUnsubscribe();
-        };
-      }, []);
+      React.useEffect(() => {
+        if (['miniLeaderboard', 'fullLeaderboard', 'result'].includes(gameState)) {
+          fetchLeaderboards();
+          const interval = setInterval(fetchLeaderboards, 15000);
+          return () => clearInterval(interval);
+        }
+      }, [gameState]);
 
       // Initialize questions and options
       React.useEffect(() => {
@@ -408,7 +400,7 @@
             {isLoading ? (
               <p className="text-lg mb-6">Loading leaderboard...</p>
             ) : leaderboardError ? (
-              <p className="text-lg mb-6 text-red-600">{leaderboardError}</p>
+              <p className="text-lg mb-6 text-red-600">Failed to load leaderboards.</p>
             ) : (
               <ul className="text-lg mb-6 space-y-2">
                 {uniqueLeaderboard.length > 0 ? (
@@ -422,6 +414,7 @@
                 )}
               </ul>
             )}
+            <p className="text-sm text-gray-500">Leaderboard updates every 15 seconds.</p>
           </div>
         );
       }, [leaderboardType, leaderboardView, miniLeaderboard, fullLeaderboard, isLoading, leaderboardError]);
@@ -449,13 +442,13 @@
               <div className="space-y-4">
                 <button
                   onClick={() => setGameState('leaderboardSelect')}
-                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   View Leaderboard
                 </button>
                 <button
                   onClick={() => setGameState('playGame')}
-                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   Play Game
                 </button>
@@ -470,13 +463,13 @@
               <div className="space-y-4 mb-6">
                 <button
                   onClick={() => setGameState('miniLeaderboard')}
-                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   Mini Game Leaderboard
                 </button>
                 <button
                   onClick={() => setGameState('fullLeaderboard')}
-                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   Full Game Leaderboard
                 </button>
@@ -534,13 +527,13 @@
               <div className="space-y-4">
                 <button
                   onClick={() => handleModeSelect('mini')}
-                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   Play Mini Game (10 Questions, 20s Timer)
                 </button>
                 <button
                   onClick={() => handleModeSelect('full')}
-                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   Play Full Game (20 Questions, No Timer)
                 </button>
@@ -577,7 +570,7 @@
                 />
                 <button
                   type="submit"
-                  className={`w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors`}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   Start Game
                 </button>
