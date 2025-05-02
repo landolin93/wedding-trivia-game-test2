@@ -23,7 +23,7 @@
       projectId: "wedding-trivia-test",
       storageBucket: "wedding-trivia-test.firebasestorage.app",
       messagingSenderId: "423493222722",
-      appId: "1:423493222722:web:0968dce8350c3ee8d4c8db",
+      appId: "1 | 423493222722 | web | 0968dce8350c3ee8d4c8db",
       measurementId: "G-LDT4H0GPFG"
     };
     firebase.initializeApp(firebaseConfig);
@@ -83,7 +83,7 @@
       },
       {
         question: "What color is the couple’s wedding theme?",
-        options: ["Blue", "Pink", "，金", "Green"],
+        options: ["Blue", "Pink", "Gold", "Green"],
         correct: "Pink"
       },
       {
@@ -159,9 +159,12 @@
       const [miniLeaderboard, setMiniLeaderboard] = React.useState([]);
       const [fullLeaderboard, setFullLeaderboard] = React.useState([]);
       const [leaderboardView, setLeaderboardView] = React.useState('top5'); // 'top5', 'top25', 'all'
+      const [leaderboardError, setLeaderboardError] = React.useState(null);
+      const [isLoading, setIsLoading] = React.useState(true);
 
       // Fetch leaderboards
       React.useEffect(() => {
+        setIsLoading(true);
         // Mini game leaderboard
         const miniUnsubscribe = db.collection('miniLeaderboard')
           .orderBy('score', 'desc')
@@ -169,8 +172,12 @@
           .onSnapshot((snapshot) => {
             const leaderboardData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setMiniLeaderboard(leaderboardData);
+            setLeaderboardError(null);
+            setIsLoading(false);
           }, (error) => {
             console.error('Error fetching mini leaderboard:', error);
+            setLeaderboardError('Failed to load Mini Game leaderboard.');
+            setIsLoading(false);
           });
 
         // Full game leaderboard
@@ -180,8 +187,12 @@
           .onSnapshot((snapshot) => {
             const leaderboardData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setFullLeaderboard(leaderboardData);
+            setLeaderboardError(null);
+            setIsLoading(false);
           }, (error) => {
             console.error('Error fetching full leaderboard:', error);
+            setLeaderboardError('Failed to load Full Game leaderboard.');
+            setIsLoading(false);
           });
 
         return () => {
@@ -323,6 +334,7 @@
         setAnswered(false);
         setTotalTime(0);
         setLeaderboardView('top5');
+        setLeaderboardError(null);
       };
 
       const renderLeaderboards = () => {
@@ -331,29 +343,41 @@
         return (
           <div>
             <h3 className="text-xl font-semibold mb-4">Mini Game Leaderboard</h3>
-            <ul className="text-lg mb-6 space-y-2">
-              {miniLeaderboard.length > 0 ? (
-                miniLeaderboard.slice(0, maxEntries).map((entry, index) => (
-                  <li key={index}>
-                    {index + 1}. {entry.name}: {entry.score}/10
-                  </li>
-                ))
-              ) : (
-                <li>No scores yet!</li>
-              )}
-            </ul>
+            {isLoading ? (
+              <p className="text-lg mb-6">Loading leaderboard...</p>
+            ) : leaderboardError ? (
+              <p className="text-lg mb-6 text-red-600">{leaderboardError}</p>
+            ) : (
+              <ul className="text-lg mb-6 space-y-2">
+                {miniLeaderboard.length > 0 ? (
+                  miniLeaderboard.slice(0, maxEntries).map((entry, index) => (
+                    <li key={index}>
+                      {index + 1}. {entry.name}: {entry.score}/10
+                    </li>
+                  ))
+                ) : (
+                  <li>No scores yet!</li>
+                )}
+              </ul>
+            )}
             <h3 className="text-xl font-semibold mb-4">Full Game Leaderboard</h3>
-            <ul className="text-lg mb-6 space-y-2">
-              {fullLeaderboard.length > 0 ? (
-                fullLeaderboard.slice(0, maxEntries).map((entry, index) => (
-                  <li key={index}>
-                    {index + 1}. {entry.name}: {entry.score}/20
-                  </li>
-                ))
-              ) : (
-                <li>No scores yet!</li>
-              )}
-            </ul>
+            {isLoading ? (
+              <p className="text-lg mb-6">Loading leaderboard...</p>
+            ) : leaderboardError ? (
+              <p className="text-lg mb-6 text-red-600">{leaderboardError}</p>
+            ) : (
+              <ul className="text-lg mb-6 space-y-2">
+                {fullLeaderboard.length > 0 ? (
+                  fullLeaderboard.slice(0, maxEntries).map((entry, index) => (
+                    <li key={index}>
+                      {index + 1}. {entry.name}: {entry.score}/20
+                    </li>
+                  ))
+                ) : (
+                  <li>No scores yet!</li>
+                )}
+              </ul>
+            )}
             <div className="space-x-4">
               <button
                 onClick={() => setLeaderboardView('top5')}
