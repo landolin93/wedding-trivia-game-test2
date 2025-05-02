@@ -592,4 +592,47 @@
               <div className="space-y-4 mb-6">
                 <button
                   onClick={() => setLeaderboardType('mini')}
-                  class
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  View Mini Game Leaderboard
+                </button>
+                <button
+                  onClick={() => setLeaderboardType('full')}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  View Full Game Leaderboard
+                </button>
+                <div className="space-x-4">
+                  <button
+                    onClick={() => setLeaderboardView('top5')}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : 'bg-gray-200'}`}
+                  >
+                    Top 5
+                  </button>
+                  <button
+                    onClick={() => setLeaderboardView('all')}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : 'bg-gray-200'}`}
+                  >
+                    All
+                  </button>
+                </div>
+              </div>
+              {renderLeaderboards()}
+              <button
+                onClick={() => setGameState('mainMenu')}
+                className="w-full bg-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors mt-4"
+              >
+                🪴 Back to Main Menu
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const rootElement = document.getElementById('root');
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(<TriviaGame />);
+  </script>
+</body>
+</html>
