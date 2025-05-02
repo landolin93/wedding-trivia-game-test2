@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wedding Trivia Game</title>
+  <title>3rd Grade School Trivia Game</title>
   <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
@@ -33,107 +33,107 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // 20 wedding-themed questions
+    // 20 school-themed questions for 3rd graders
     const allQuestions = [
       {
-        question: "Where did the couple first meet?",
-        options: ["College", "Coffee Shop", "Mutual Friend", "Online"],
-        correct: "College"
+        question: "What is 5 + 3?",
+        options: ["6", "7", "8", "9"],
+        correct: "8"
       },
       {
-        question: "What is the couple's favorite shared hobby?",
-        options: ["Hiking", "Cooking", "Traveling", "Gaming"],
-        correct: "Traveling"
+        question: "Which planet do we live on?",
+        options: ["Mars", "Earth", "Jupiter", "Venus"],
+        correct: "Earth"
       },
       {
-        question: "What was the destination of their first trip together?",
-        options: ["Paris", "New York", "Bali", "Tokyo"],
-        correct: "Paris"
+        question: "What is the capital of the United States?",
+        options: ["Florida", "New York", "Washington, D.C.", "California"],
+        correct: "Washington, D.C."
       },
       {
-        question: "What song did they choose for their first dance?",
-        options: ["Perfect by Ed Sheeran", "At Last by Etta James", "Can't Help Falling in Love by Elvis Presley", "All of Me by John Legend"],
-        correct: "Can't Help Falling in Love by Elvis Presley"
+        question: "How many legs does a spider have?",
+        options: ["6", "8", "10", "12"],
+        correct: "8"
       },
       {
-        question: "What is the couple’s favorite dessert to share?",
-        options: ["Chocolate Cake", "Ice Cream", "Cheesecake", "Tiramisu"],
-        correct: "Cheesecake"
+        question: "What is the opposite of big?",
+        options: ["Tall", "Small", "Long", "Wide"],
+        correct: "Small"
       },
       {
-        question: "Where was their first date?",
-        options: ["Movie Theater", "Restaurant", "Park", "Beach"],
-        correct: "Restaurant"
-      },
-      {
-        question: "What pet does the couple own together?",
-        options: ["Dog", "Cat", "Fish", "None"],
+        question: "Which animal is known as man's best friend?",
+        options: ["Cat", "Dog", "Bird", "Fish"],
         correct: "Dog"
       },
       {
-        question: "What is the couple’s favorite movie to watch together?",
-        options: ["The Notebook", "Inception", "La La Land", "Star Wars"],
-        correct: "La La Land"
+        question: "What color is a ruby?",
+        options: ["Blue", "Green", "Red", "Yellow"],
+        correct: "Red"
       },
       {
-        question: "What season did the couple get engaged in?",
-        options: ["Spring", "Summer", "Fall", "Winter"],
+        question: "How many days are in a week?",
+        options: ["5", "6", "7", "8"],
+        correct: "7"
+      },
+      {
+        question: "What do plants need to grow?",
+        options: ["Books", "Toys", "Sunlight", "Music"],
+        correct: "Sunlight"
+      },
+      {
+        question: "What is 10 - 4?",
+        options: ["5", "6", "7", "8"],
+        correct: "6"
+      },
+      {
+        question: "Which season comes after summer?",
+        options: ["Spring", "Fall", "Winter", "Summer"],
         correct: "Fall"
       },
       {
-        question: "What is the couple’s favorite weekend activity?",
-        options: ["Brunch", "Hiking", "Movie Night", "Shopping"],
-        correct: "Brunch"
+        question: "What is the shape of a stop sign?",
+        options: ["Circle", "Triangle", "Square", "Octagon"],
+        correct: "Octagon"
       },
       {
-        question: "What color is the couple’s wedding theme?",
-        options: ["Blue", "Pink", "Gold", "Green"],
-        correct: "Pink"
+        question: "How many months are in a year?",
+        options: ["10", "11", "12", "13"],
+        correct: "12"
       },
       {
-        question: "What instrument does one of the couple play?",
-        options: ["Guitar", "Piano", "Violin", "None"],
-        correct: "Piano"
+        question: "What do bees make?",
+        options: ["Milk", "Honey", "Cheese", "Juice"],
+        correct: "Honey"
       },
       {
-        question: "What is the couple’s favorite holiday?",
-        options: ["Christmas", "Halloween", "Thanksgiving", "Valentine’s Day"],
-        correct: "Christmas"
+        question: "What is the name of our galaxy?",
+        options: ["Milky Way", "Andromeda", "Spiral", "Starburst"],
+        correct: "Milky Way"
       },
       {
-        question: "Where did the couple get engaged?",
-        options: ["Beach", "Mountain", "City Park", "Restaurant"],
-        correct: "Beach"
+        question: "What is 2 x 3?",
+        options: ["5", "6", "7", "8"],
+        correct: "6"
       },
       {
-        question: "What is the couple’s favorite board game?",
-        options: ["Monopoly", "Scrabble", "Catan", "Chess"],
-        correct: "Scrabble"
+        question: "Which bird cannot fly?",
+        options: ["Eagle", "Penguin", "Sparrow", "Owl"],
+        correct: "Penguin"
       },
       {
-        question: "What type of cuisine do they love most?",
-        options: ["Italian", "Mexican", "Japanese", "Indian"],
-        correct: "Italian"
+        question: "What is the largest continent?",
+        options: ["Africa", "Asia", "Australia", "Europe"],
+        correct: "Asia"
       },
       {
-        question: "What was the couple’s first concert together?",
-        options: ["Coldplay", "Beyoncé", "The Beatles Tribute", "Local Band"],
-        correct: "Coldplay"
+        question: "How many sides does a triangle have?",
+        options: ["2", "3", "4", "5"],
+        correct: "3"
       },
       {
-        question: "What is the couple’s dream vacation spot?",
-        options: ["Maldives", "Italy", "Australia", "Canada"],
-        correct: "Italy"
-      },
-      {
-        question: "What sport do they enjoy watching together?",
-        options: ["Football", "Basketball", "Tennis", "None"],
-        correct: "Tennis"
-      },
-      {
-        question: "What is the couple’s favorite coffee order?",
-        options: ["Latte", "Cappuccino", "Black Coffee", "Mocha"],
-        correct: "Latte"
+        question: "What do you use to write on a chalkboard?",
+        options: ["Pen", "Pencil", "Chalk", "Marker"],
+        correct: "Chalk"
       }
     ];
 
@@ -435,8 +435,8 @@
           )}
           {gameState === 'mainMenu' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4 text-amber-600">Wedding Trivia Game</h1>
-              <p className="text-lg mb-6">Welcome to the trivia game!</p>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">3rd Grade School Trivia Game</h1>
+              <p className="text-lg mb-6">Welcome to the school trivia game!</p>
               <div className="space-y-4">
                 <button
                   onClick={() => setGameState('leaderboardSelect')}
@@ -458,7 +458,7 @@
             <div>
               <h1 className="text-3xl font-bold mb-4 text-amber-600">Leaderboards</h1>
               <p className="text-lg mb-6">Select a leaderboard to view</p>
-              <div className="space-y-4 mb-6">
+              <div className="space-y-4">
                 <button
                   onClick={() => setGameState('miniLeaderboard')}
                   className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
@@ -471,13 +471,13 @@
                 >
                   Full Game Leaderboard
                 </button>
+                <button
+                  onClick={() => setGameState('mainMenu')}
+                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                >
+                  🪴 Back to Main Menu
+                </button>
               </div>
-              <button
-                onClick={() => setGameState('mainMenu')}
-                className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
-              >
-                🪴 Back to Main Menu
-              </button>
             </div>
           )}
 
@@ -486,7 +486,7 @@
               <h1 className="text-3xl font-bold mb-4 text-amber-600">
                 {gameState === 'miniLeaderboard' ? 'Mini Game Leaderboard' : 'Full Game Leaderboard'}
               </h1>
-              <div className="space-y-4 mb-6">
+              <div className="space-y-4">
                 <div className="space-x-4">
                   <button
                     onClick={() => setLeaderboardView('top5')}
@@ -507,14 +507,14 @@
                 >
                   Back to Leaderboard Selection
                 </button>
+                <button
+                  onClick={() => setGameState('mainMenu')}
+                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                >
+                  🪴 Back to Main Menu
+                </button>
               </div>
               {renderLeaderboards()}
-              <button
-                onClick={() => setGameState('mainMenu')}
-                className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
-              >
-                🪴 Back to Main Menu
-              </button>
             </div>
           )}
 
@@ -535,19 +535,19 @@
                 >
                   Play Full Game (20 Questions, No Timer)
                 </button>
+                <button
+                  onClick={() => setGameState('mainMenu')}
+                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                >
+                  🪴 Back to Main Menu
+                </button>
               </div>
-              <button
-                onClick={() => setGameState('mainMenu')}
-                className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
-              >
-                🪴 Back to Main Menu
-              </button>
             </div>
           )}
 
           {gameState === 'nameInput' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4 text-amber-600">Wedding Trivia Game</h1>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">3rd Grade School Trivia Game</h1>
               <p className="text-lg mb-6">Enter your name to start the {gameMode === 'mini' ? 'Mini' : 'Full'} Game!</p>
               <form onSubmit={handleNameSubmit} className="space-y-4">
                 <input
@@ -578,19 +578,19 @@
                 >
                   Back to Play Game
                 </button>
+                <button
+                  onClick={() => setGameState('mainMenu')}
+                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                >
+                  🪴 Back to Main Menu
+                </button>
               </form>
-              <button
-                onClick={() => setGameState('mainMenu')}
-                className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
-              >
-                🪴 Back to Main Menu
-              </button>
             </div>
           )}
 
           {gameState === 'playing' && questions.length > 0 && (
             <div>
-              <h1 className="text-3xl font-bold mb-4 text-amber-600">Wedding Trivia Game</h1>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">3rd Grade School Trivia Game</h1>
               <p className="text-lg mb-6">Welcome, {firstName} {lastName}!</p>
               {gameMode === 'mini' && (
                 <p className="text-md mb-4 text-red-600">Time left: {timer}s</p>
@@ -625,12 +625,12 @@
               </p>
               <p className="text-md mb-6">
                 {score === questions.length
-                  ? "Perfect! You're a true expert on the couple!"
+                  ? "Perfect! You're a school trivia star!"
                   : score >= questions.length / 2
-                  ? "Great job! You know the couple well!"
-                  : "Nice try! Maybe chat with the couple more!"}
+                  ? "Great job! You know your school facts!"
+                  : "Nice try! Keep studying!"}
               </p>
-              <div className="space-y-4 mb-6">
+              <div className="space-y-4">
                 <button
                   onClick={() => setLeaderboardType('mini')}
                   className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'mini' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
@@ -657,14 +657,14 @@
                     All
                   </button>
                 </div>
+                <button
+                  onClick={() => setGameState('mainMenu')}
+                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                >
+                  🪴 Back to Main Menu
+                </button>
               </div>
               {renderLeaderboards()}
-              <button
-                onClick={() => setGameState('mainMenu')}
-                className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
-              >
-                🪴 Back to Main Menu
-              </button>
             </div>
           )}
         </div>
