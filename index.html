@@ -212,7 +212,7 @@
         }
       }, [gameState]);
 
-      // Fetch leaderboards every 15 seconds
+      // Fetch leaderboards
       const fetchLeaderboards = async () => {
         setIsLoading(true);
         try {
@@ -234,11 +234,10 @@
         setIsLoading(false);
       };
 
+      // Fetch leaderboards only when leaderboard screen is selected
       React.useEffect(() => {
         if (['miniLeaderboard', 'fullLeaderboard', 'result'].includes(gameState)) {
           fetchLeaderboards();
-          const interval = setInterval(fetchLeaderboards, 15000);
-          return () => clearInterval(interval);
         }
       }, [gameState]);
 
@@ -414,7 +413,6 @@
                 )}
               </ul>
             )}
-            <p className="text-sm text-gray-500">Leaderboard updates every 15 seconds.</p>
           </div>
         );
       }, [leaderboardType, leaderboardView, miniLeaderboard, fullLeaderboard, isLoading, leaderboardError]);
