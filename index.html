@@ -8,11 +8,27 @@
   <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"></script>
 </head>
 <body class="bg-gray-100 font-sans">
   <div id="root" class="min-h-screen flex items-center justify-center"></div>
 
   <script type="text/babel">
+    // Initialize Firebase with provided config
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-uMdBpQhau_mQRQwtUqDbNqlPR8LVfq4",
+      authDomain: "wedding-trivia-test.firebaseapp.com",
+      projectId: "wedding-trivia-test",
+      storageBucket: "wedding-trivia-test.firebasestorage.app",
+      messagingSenderId: "423493222722",
+      appId: "1:423493222722:web:0968dce8350c3ee8d4c8db",
+      measurementId: "G-LDT4H0GPFG"
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     const questions = [
       {
         question: "Where did the couple first meet?",
@@ -43,9 +59,19 @@
       const [currentQuestion, setCurrentQuestion] = React.useState(0);
       const [score, setScore] = React.useState(0);
       const [selectedOption, setSelectedOption] = React.useState(null);
-      const [leaderboard, setLeaderboard] = React.useState(
-        JSON.parse(localStorage.getItem('leaderboard')) || []
-      );
+      const [leaderboard, setLeaderboard] = React.useState([]);
+
+      // Fetch leaderboard from Firestore on component mount
+      React.useEffect(() => {
+        const unsubscribe = db.collection('leaderboard')
+          .orderBy('score', 'desc')
+          .limit(5)
+          .onSnapshot((snapshot) => {
+            const leaderboardData = snapshot.docs.map(doc => doc.data());
+            setLeaderboard(leaderboardData);
+          });
+        return () => unsubscribe();
+      }, []);
 
       const handleNameSubmit = (e) => {
         e.preventDefault();
@@ -66,16 +92,14 @@
             setCurrentQuestion(currentQuestion + 1);
             setSelectedOption(null);
           } else {
-            // Save score to leaderboard
-            const newEntry = {
+            // Calculate final score
+            const finalScore = score + (option === questions[currentQuestion].correct ? 1 : 0);
+            // Save score to Firestore
+            db.collection('leaderboard').add({
               name: `${firstName} ${lastName}`,
-              score: score + (option === questions[currentQuestion].correct ? 1 : 0)
-            };
-            const updatedLeaderboard = [...leaderboard, newEntry]
-              .sort((a, b) => b.score - a.score)
-              .slice(0, 5); // Keep top 5
-            setLeaderboard(updatedLeaderboard);
-            localStorage.setItem('leaderboard', JSON.stringify(updatedLeaderboard));
+              score: finalScore,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(error => console.error('Error saving score:', error));
             setGameState('result');
           }
         }, 1000);
@@ -131,67 +155,4 @@
                 Question {currentQuestion + 1} of {questions.length}
               </h2>
               <p className="text-lg mb-6">{questions[currentQuestion].question}</p>
-              <div className="space-y-4">
-                {questions[currentQuestion].options.map((option, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleAnswer(option)}
-                    disabled={selectedOption !== null}
-                    className={`w-full py-2 px-4 rounded-lg text-left transition-colors ${
-                      selectedOption === option
-                        ? option === questions[currentQuestion].correct
-                          ? 'bg-green-500 text-white'
-                          : 'bg-red-500 text-white'
-                        : 'bg-gray-200 hover:bg-gray-300'
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {gameState === 'result' && (
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Game Over, {firstName} {lastName}!</h2>
-              <p className="text-lg mb-6">
-                You scored {score} out of {questions.length}!
-              </p>
-              <p className="text-md mb-6">
-                {score === questions.length
-                  ? "Perfect! You're a true expert on the couple!"
-                  : score >= questions.length / 2
-                  ? "Great job! You know the couple well!"
-                  : "Nice try! Maybe chat with the couple more!"}
-              </p>
-              <h3 className="text-xl font-semibold mb-4">Leaderboard</h3>
-              <ul className="text-lg mb-6 space-y-2">
-                {leaderboard.length > 0 ? (
-                  leaderboard.map((entry, index) => (
-                    <li key={index}>
-                      {index + 1}. {entry.name}: {entry.score}/{questions.length}
-                    </li>
-                  ))
-                ) : (
-                  <li>No scores yet!</li>
-                )}
-              </ul>
-              <button
-                onClick={restartGame}
-                className="bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition-colors"
-              >
-                Play Again
-              </button>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    const rootElement = document.getElementById('root');
-    const root = ReactDOM.createRoot(rootElement);
-    root.render(<TriviaGame />);
-  </script>
-</body>
-</html>
+              <div className="space
