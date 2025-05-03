@@ -225,6 +225,7 @@
 
     // Format time from seconds to hours, minutes, seconds (omit 0h, 0m)
     function formatTime(seconds) {
+      if (!seconds && seconds !== 0) return '0.00s';
       const hours = Math.floor(seconds / 3600);
       const minutes = Math.floor((seconds % 3600) / 60);
       const remainingSeconds = (seconds % 60).toFixed(2);
@@ -262,6 +263,7 @@
       const [questionStartTime, setQuestionStartTime] = React.useState(null);
       const [muted, setMuted] = React.useState(false);
       const [darkMode, setDarkMode] = React.useState(false);
+      const [lastFetchTimes, setLastFetchTimes] = React.useState({});
 
       // Toggle dark mode classes
       React.useEffect(() => {
@@ -329,10 +331,17 @@
             .orderBy('completionTime', 'asc')
             .limit(10)
             .get();
-          const miniData = miniSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
+          console.log('Mini snapshot size:', miniSnapshot.size);
+          const miniData = miniSnapshot.empty ? [] : miniSnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              name: data.name || 'Unknown',
+              score: data.score || 0,
+              completionTime: data.completionTime || 0,
+              timestamp: data.timestamp || null
+            };
+          });
           setMiniLeaderboard(miniData);
 
           // Fetch Full Leaderboard
@@ -341,32 +350,57 @@
             .orderBy('completionTime', 'asc')
             .limit(10)
             .get();
-          const fullData = fullSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
+          console.log('Full snapshot size:', fullSnapshot.size);
+          const fullData = fullSnapshot.empty ? [] : fullSnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              name: data.name || 'Unknown',
+              score: data.score || 0,
+              completionTime: data.completionTime || 0,
+              timestamp: data.timestamp || null
+            };
+          });
           setFullLeaderboard(fullData);
+
+          // Update last fetch time
+          setLastFetchTimes(prev => ({
+            ...prev,
+            [gameState]: Date.now()
+          }));
         } catch (error) {
-          console.error('Error fetching leaderboards:', error);
+          console.error('Fetch error:', error.message, error.stack);
           setLeaderboardError(language === 'en'
-            ? 'Failed to load leaderboards. Please check your Firebase configuration.'
-            : '无法加载排行榜。请检查您的Firebase配置。');
+            ? 'Failed to load leaderboards: ' + error.message
+            : '无法加载排行榜：' + error.message);
         } finally {
           setIsLoading(false);
         }
       };
 
-      // Poll leaderboards every 15 seconds
+      // Fetch leaderboards on navigation with 15-second throttle
       React.useEffect(() => {
+        console.log('Navigated to:', gameState, 'at:', new Date().toISOString());
         if (['miniLeaderboard', 'fullLeaderboard', 'result'].includes(gameState) && db && !isLoading) {
-          fetchLeaderboards(); // Initial fetch
-          const interval = setInterval(() => {
-            console.log('Polling leaderboards at:', new Date().toISOString());
-            if (!isLoading) fetchLeaderboards();
-          }, 15000); // Every 15 seconds
-          return () => clearInterval(interval); // Cleanup
+          const lastFetchTime = lastFetchTimes[gameState] || 0;
+          const elapsed = (Date.now() - lastFetchTime) / 1000;
+          if (elapsed >= 15) {
+            console.log('Fetching for', gameState, 'elapsed:', elapsed.toFixed(2), 'seconds');
+            fetchLeaderboards();
+          } else {
+            console.log('Skipping fetch for', gameState, 'last fetch:', new Date(lastFetchTime).toISOString());
+          }
+        } else if (!['miniLeaderboard', 'fullLeaderboard', 'result'].includes(gameState)) {
+          // Reset last fetch time when leaving leaderboard states
+          setLastFetchTimes(prev => {
+            const newTimes = { ...prev };
+            delete newTimes.miniLeaderboard;
+            delete newTimes.fullLeaderboard;
+            delete newTimes.result;
+            return newTimes;
+          });
         }
-      }, [gameState, isLoading]);
+      }, [gameState, lastFetchTimes]);
 
       // Initialize questions and options
       React.useEffect(() => {
@@ -958,7 +992,8 @@
                   {language === 'en' ? 'Top 5' : '前5'}
                 </button>
                 <button
-                  onClick={() => setLeaderboardView('all')}
+                  o
+                  nClick={() => setLeaderboardView('all')}
                   className={`w-12 h-12 rounded-lg flex items-center justify-center text-xs ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   {language === 'en' ? 'All' : '全部'}
