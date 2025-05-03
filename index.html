@@ -660,13 +660,13 @@
                 <div className="space-x-4">
                   <button
                     onClick={() => setLeaderboardView('top5')}
-                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                   >
                     {language === 'en' ? 'Top 5' : '前5名'}
                   </button>
                   <button
                     onClick={() => setLeaderboardView('all')}
-                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                   >
                     {language === 'en' ? 'All' : '全部'}
                   </button>
@@ -827,33 +827,33 @@
               <div className="space-y-4">
                 <button
                   onClick={() => setLeaderboardType('mini')}
-                  className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'mini' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
+                  className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'mini' ? 'bg-amber-600 text-white' : darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   {language === 'en' ? 'View Mini Game Leaderboard' : '查看迷你游戏排行榜'}
                 </button>
                 <button
                   onClick={() => setLeaderboardType('full')}
-                  className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'full' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
+                  className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'full' ? 'bg-amber-600 text-white' : darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   {language === 'en' ? 'View Full Game Leaderboard' : '查看完整游戏排行榜'}
                 </button>
                 <div className="space-x-4">
                   <button
                     onClick={() => setLeaderboardView('top5')}
-                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                   >
                     {language === 'en' ? 'Top 5' : '前5名'}
                   </button>
                   <button
                     onClick={() => setLeaderboardView('all')}
-                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
+                    className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                   >
                     {language === 'en' ? 'All' : '全部'}
                   </button>
                 </div>
                 <button
                   onClick={() => setGameState('mainMenu')}
-                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
+                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   🪴 {language === 'en' ? 'Back to Main Menu' : '返回主菜单'}
                 </button>
