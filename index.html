@@ -533,17 +533,34 @@
               ) : leaderboardError ? (
                 <p className="text-lg mb-6 text-red-600">{leaderboardError}</p>
               ) : (
-                <ul className="text-lg mb-6 space-y-2">
-                  {uniqueLeaderboard.length > 0 ? (
-                    uniqueLeaderboard.slice(0, maxEntries).map((entry, index) => (
-                      <li key={index}>
-                        {index + 1}. {entry.name}: {entry.score}/{maxScore}, {Math.round(entry.completionTime)}s
-                      </li>
-                    ))
-                  ) : (
-                    <li>{language === 'en' ? 'No scores yet!' : '还没有分数！'}</li>
-                  )}
-                </ul>
+                <div className="overflow-x-auto mb-6">
+                  <table className={`table-auto w-full max-w-md mx-auto text-left text-sm ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                    <thead>
+                      <tr className={darkMode ? 'bg-gray-700' : 'bg-gray-200'}>
+                        <th className="px-4 py-2 border">{language === 'en' ? 'Name' : '姓名'}</th>
+                        <th className="px-4 py-2 border">{language === 'en' ? 'Score' : '分数'}</th>
+                        <th className="px-4 py-2 border">{language === 'en' ? 'Time' : '时间'}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {uniqueLeaderboard.length > 0 ? (
+                        uniqueLeaderboard.slice(0, maxEntries).map((entry, index) => (
+                          <tr key={index} className={darkMode ? 'bg-gray-800' : 'bg-white'}>
+                            <td className="px-4 py-2 border min-w-0">{entry.name}</td>
+                            <td className="px-4 py-2 border">{entry.score}/{maxScore}</td>
+                            <td className="px-4 py-2 border">{entry.completionTime.toFixed(2)}s</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="3" className="px-4 py-2 border text-center">
+                            {language === 'en' ? 'No scores yet!' : '还没有分数！'}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           );
@@ -551,7 +568,7 @@
           console.error('Error rendering leaderboards:', error);
           return <p className="text-lg mb-6 text-red-600">{language === 'en' ? 'Error displaying leaderboard.' : '显示排行榜时出错。'}</p>;
         }
-      }, [leaderboardType, leaderboardView, miniLeaderboard, fullLeaderboard, isLoading, leaderboardError, language]);
+      }, [leaderboardType, leaderboardView, miniLeaderboard, fullLeaderboard, isLoading, leaderboardError, language, darkMode]);
 
       return (
         <div className={`p-8 rounded-lg shadow-lg max-w-lg w-full text-center ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
@@ -853,8 +870,8 @@
               </p>
               <p className="text-md mb-6">
                 {language === 'en'
-                  ? `Completed in ${Math.round(totalTime)} seconds!`
-                  : `在 ${Math.round(totalTime)} 秒内完成！`}
+                  ? `Completed in ${totalTime.toFixed(2)} seconds!`
+                  : `在 ${totalTime.toFixed(2)} 秒内完成！`}
               </p>
               <p className="text-md mb-6">
                 {score === questions.length
