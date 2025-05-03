@@ -33,107 +33,240 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // 20 school-themed questions for 3rd graders
+    // 20 school-themed questions for 3rd graders with translations
     const allQuestions = [
       {
-        question: "What is 5 + 3?",
-        options: ["6", "7", "8", "9"],
+        question: {
+          en: "What is 5 + 3?",
+          zh: "5 + 3 等于多少？"
+        },
+        options: {
+          en: ["6", "7", "8", "9"],
+          zh: ["6", "7", "8", "9"]
+        },
         correct: "8"
       },
       {
-        question: "Which planet do we live on?",
-        options: ["Mars", "Earth", "Jupiter", "Venus"],
-        correct: "Earth"
+        question: {
+          en: "Which planet do we live on?",
+          zh: "我们住在哪个星球上？"
+        },
+        options: {
+          en: ["Mars", "Earth", "Jupiter", "Venus"],
+          zh: ["火星", "地球", "木星", "金星"]
+        },
+        correct: "Earth",
+        correctZh: "地球"
       },
       {
-        question: "What is the capital of the United States?",
-        options: ["Florida", "New York", "Washington, D.C.", "California"],
-        correct: "Washington, D.C."
+        question: {
+          en: "What is the capital of the United States?",
+          zh: "美国的首都是哪里？"
+        },
+        options: {
+          en: ["Florida", "New York", "Washington, D.C.", "California"],
+          zh: ["佛罗里达", "纽约", "华盛顿特区", "加利福尼亚"]
+        },
+        correct: "Washington, D.C.",
+        correctZh: "华盛顿特区"
       },
       {
-        question: "How many legs does a spider have?",
-        options: ["6", "8", "10", "12"],
+        question: {
+          en: "How many legs does a spider have?",
+          zh: "蜘蛛有多少条腿？"
+        },
+        options: {
+          en: ["6", "8", "10", "12"],
+          zh: ["6", "8", "10", "12"]
+        },
         correct: "8"
       },
       {
-        question: "What is the opposite of big?",
-        options: ["Tall", "Small", "Long", "Wide"],
-        correct: "Small"
+        question: {
+          en: "What is the opposite of big?",
+          zh: "大的反义词是什么？"
+        },
+        options: {
+          en: ["Tall", "Small", "Long", "Wide"],
+          zh: ["高", "小", "长", "宽"]
+        },
+        correct: "Small",
+        correctZh: "小"
       },
       {
-        question: "Which animal is known as man's best friend?",
-        options: ["Cat", "Dog", "Bird", "Fish"],
-        correct: "Dog"
+        question: {
+          en: "Which animal is known as man's best friend?",
+          zh: "哪种动物被称为人类最好的朋友？"
+        },
+        options: {
+          en: ["Cat", "Dog", "Bird", "Fish"],
+          zh: ["猫", "狗", "鸟", "鱼"]
+        },
+        correct: "Dog",
+        correctZh: "狗"
       },
       {
-        question: "What color is a ruby?",
-        options: ["Blue", "Green", "Red", "Yellow"],
-        correct: "Red"
+        question: {
+          en: "What color is a ruby?",
+          zh: "红宝石是什么颜色？"
+        },
+        options: {
+          en: ["Blue", "Green", "Red", "Yellow"],
+          zh: ["蓝色", "绿色", "红色", "黄色"]
+        },
+        correct: "Red",
+        correctZh: "红色"
       },
       {
-        question: "How many days are in a week?",
-        options: ["5", "6", "7", "8"],
+        question: {
+          en: "How many days are in a week?",
+          zh: "一周有多少天？"
+        },
+        options: {
+          en: ["5", "6", "7", "8"],
+          zh: ["5", "6", "7", "8"]
+        },
         correct: "7"
       },
       {
-        question: "What do plants need to grow?",
-        options: ["Books", "Toys", "Sunlight", "Music"],
-        correct: "Sunlight"
+        question: {
+          en: "What do plants need to grow?",
+          zh: "植物生长需要什么？"
+        },
+        options: {
+          en: ["Books", "Toys", "Sunlight", "Music"],
+          zh: ["书", "玩具", "阳光", "音乐"]
+        },
+        correct: "Sunlight",
+        correctZh: "阳光"
       },
       {
-        question: "What is 10 - 4?",
-        options: ["5", "6", "7", "8"],
+        question: {
+          en: "What is 10 - 4?",
+          zh: "10 - 4 等于多少？"
+        },
+        options: {
+          en: ["5", "6", "7", "8"],
+          zh: ["5", "6", "7", "8"]
+        },
         correct: "6"
       },
       {
-        question: "Which season comes after summer?",
-        options: ["Spring", "Fall", "Winter", "Summer"],
-        correct: "Fall"
+        question: {
+          en: "Which season comes after summer?",
+          zh: "夏天之后的季节是什么？"
+        },
+        options: {
+          en: ["Spring", "Fall", "Winter", "Summer"],
+          zh: ["春天", "秋天", "冬天", "夏天"]
+        },
+        correct: "Fall",
+        correctZh: "秋天"
       },
       {
-        question: "What is the shape of a stop sign?",
-        options: ["Circle", "Triangle", "Square", "Octagon"],
-        correct: "Octagon"
+        question: {
+          en: "What is the shape of a stop sign?",
+          zh: "停车标志的形状是什么？"
+        },
+        options: {
+          en: ["Circle", "Triangle", "Square", "Octagon"],
+          zh: ["圆形", "三角形", "正方形", "八边形"]
+        },
+        correct: "Octagon",
+        correctZh: "八边形"
       },
       {
-        question: "How many months are in a year?",
-        options: ["10", "11", "12", "13"],
+        question: {
+          en: "How many months are in a year?",
+          zh: "一年有多少个月？"
+        },
+        options: {
+          en: ["10", "11", "12", "13"],
+          zh: ["10", "11", "12", "13"]
+        },
         correct: "12"
       },
       {
-        question: "What do bees make?",
-        options: ["Milk", "Honey", "Cheese", "Juice"],
-        correct: "Honey"
+        question: {
+          en: "What do bees make?",
+          zh: "蜜蜂制造什么？"
+        },
+        options: {
+          en: ["Milk", "Honey", "Cheese", "Juice"],
+          zh: ["牛奶", "蜂蜜", "奶酪", "果汁"]
+        },
+        correct: "Honey",
+        correctZh: "蜂蜜"
       },
       {
-        question: "What is the name of our galaxy?",
-        options: ["Milky Way", "Andromeda", "Spiral", "Starburst"],
-        correct: "Milky Way"
+        question: {
+          en: "What is the name of our galaxy?",
+          zh: "我们银河系的名字是什么？"
+        },
+        options: {
+          en: ["Milky Way", "Andromeda", "Spiral", "Starburst"],
+          zh: ["银河系", "仙女座", "螺旋", "星爆"]
+        },
+        correct: "Milky Way",
+        correctZh: "银河系"
       },
       {
-        question: "What is 2 x 3?",
-        options: ["5", "6", "7", "8"],
+        question: {
+          en: "What is 2 x 3?",
+          zh: "2 x 3 等于多少？"
+        },
+        options: {
+          en: ["5", "6", "7", "8"],
+          zh: ["5", "6", "7", "8"]
+        },
         correct: "6"
       },
       {
-        question: "Which bird cannot fly?",
-        options: ["Eagle", "Penguin", "Sparrow", "Owl"],
-        correct: "Penguin"
+        question: {
+          en: "Which bird cannot fly?",
+          zh: "哪种鸟不会飞？"
+        },
+        options: {
+          en: ["Eagle", "Penguin", "Sparrow", "Owl"],
+          zh: ["鹰", "企鹅", "麻雀", "猫头鹰"]
+        },
+        correct: "Penguin",
+        correctZh: "企鹅"
       },
       {
-        question: "What is the largest continent?",
-        options: ["Africa", "Asia", "Australia", "Europe"],
-        correct: "Asia"
+        question: {
+          en: "What is the largest continent?",
+          zh: "最大的大陆是什么？"
+        },
+        options: {
+          en: ["Africa", "Asia", "Australia", "Europe"],
+          zh: ["非洲", "亚洲", "澳大利亚", "欧洲"]
+        },
+        correct: "Asia",
+        correctZh: "亚洲"
       },
       {
-        question: "How many sides does a triangle have?",
-        options: ["2", "3", "4", "5"],
+        question: {
+          en: "How many sides does a triangle have?",
+          zh: "三角形有多少条边？"
+        },
+        options: {
+          en: ["2", "3", "4", "5"],
+          zh: ["2", "3", "4", "5"]
+        },
         correct: "3"
       },
       {
-        question: "What do you use to write on a chalkboard?",
-        options: ["Pen", "Pencil", "Chalk", "Marker"],
-        correct: "Chalk"
+        question: {
+          en: "What do you use to write on a chalkboard?",
+          zh: "你在黑板上用什么写字？"
+        },
+        options: {
+          en: ["Pen", "Pencil", "Chalk", "Marker"],
+          zh: ["钢笔", "铅笔", "粉笔", "马克笔"]
+        },
+        correct: "Chalk",
+        correctZh: "粉笔"
       }
     ];
 
@@ -148,7 +281,8 @@
     }
 
     function TriviaGame() {
-      const [gameState, setGameState] = React.useState('mainMenu');
+      const [gameState, setGameState] = React.useState('languageSelect');
+      const [language, setLanguage] = React.useState(null);
       const [firstName, setFirstName] = React.useState('');
       const [lastName, setLastName] = React.useState('');
       const [gameMode, setGameMode] = React.useState(null);
@@ -247,10 +381,10 @@
           const questionCount = gameMode === 'mini' ? 10 : allQuestions.length;
           const shuffledQuestions = shuffle(allQuestions).slice(0, questionCount);
           setQuestions(shuffledQuestions);
-          setShuffledOptions(shuffledQuestions.map(q => shuffle(q.options)));
+          setShuffledOptions(shuffledQuestions.map(q => shuffle(q.options[language])));
           setQuestionStartTime(performance.now());
         }
-      }, [gameState, gameMode, questions]);
+      }, [gameState, gameMode, questions, language]);
 
       // Timer logic for Mini Game only
       React.useEffect(() => {
@@ -263,6 +397,11 @@
           handleTimeout();
         }
       }, [timer, gameState, answered, gameMode]);
+
+      const handleLanguageSelect = (lang) => {
+        setLanguage(lang);
+        setGameState('mainMenu');
+      };
 
       const handleModeSelect = (mode) => {
         setGameMode(mode);
@@ -283,7 +422,7 @@
           setQuestionStartTime(null);
           setGameState('playing');
         } else {
-          alert('Please enter both first and last name.');
+          alert(language === 'en' ? 'Please enter both first and last name.' : '请输入名字和姓氏。');
         }
       };
 
@@ -310,7 +449,8 @@
         setAnswered(true);
         const timeSpent = gameMode === 'mini' ? 20 - timer : (performance.now() - questionStartTime) / 1000;
         setTotalTime(prev => prev + timeSpent);
-        if (option === questions[currentQuestion].correct) {
+        const correctAnswer = questions[currentQuestion].correctZh && language === 'zh' ? questions[currentQuestion].correctZh : questions[currentQuestion].correct;
+        if (option === correctAnswer) {
           setScore(score + 1);
         }
         setTimeout(() => {
@@ -321,7 +461,7 @@
             setSelectedOption(null);
             setQuestionStartTime(performance.now());
           } else {
-            const finalScore = score + (option === questions[currentQuestion].correct ? 1 : 0);
+            const finalScore = score + (option === correctAnswer ? 1 : 0);
             saveScoreAndCheckEntries(finalScore);
             setLeaderboardType(gameMode);
             setLeaderboardView('top5');
@@ -381,7 +521,9 @@
       const renderLeaderboards = React.useCallback(() => {
         const maxEntries = leaderboardView === 'top5' ? 5 : Infinity;
         const leaderboard = leaderboardType === 'mini' ? miniLeaderboard : fullLeaderboard;
-        const leaderboardTitle = leaderboardType === 'mini' ? 'Mini Game Leaderboard' : 'Full Game Leaderboard';
+        const leaderboardTitle = language === 'en' 
+          ? (leaderboardType === 'mini' ? 'Mini Game Leaderboard' : 'Full Game Leaderboard')
+          : (leaderboardType === 'mini' ? '迷你游戏排行榜' : '完整游戏排行榜');
         const maxScore = leaderboardType === 'mini' ? 10 : 20;
 
         const uniqueLeaderboard = Object.values(
@@ -395,11 +537,11 @@
 
         return (
           <div>
-            <h3 className="text-xl font-semibold mb-4">Current: {leaderboardTitle}</h3>
+            <h3 className="text-xl font-semibold mb-4">{leaderboardTitle}</h3>
             {isLoading ? (
-              <p className="text-lg mb-6">Loading leaderboard...</p>
+              <p className="text-lg mb-6">{language === 'en' ? 'Loading leaderboard...' : '加载排行榜...'}</p>
             ) : leaderboardError ? (
-              <p className="text-lg mb-6 text-red-600">Failed to load leaderboards.</p>
+              <p className="text-lg mb-6 text-red-600">{language === 'en' ? 'Failed to load leaderboards.' : '无法加载排行榜。'}</p>
             ) : (
               <ul className="text-lg mb-6 space-y-2">
                 {uniqueLeaderboard.length > 0 ? (
@@ -409,13 +551,13 @@
                     </li>
                   ))
                 ) : (
-                  <li>No scores yet!</li>
+                  <li>{language === 'en' ? 'No scores yet!' : '还没有分数！'}</li>
                 )}
               </ul>
             )}
           </div>
         );
-      }, [leaderboardType, leaderboardView, miniLeaderboard, fullLeaderboard, isLoading, leaderboardError]);
+      }, [leaderboardType, leaderboardView, miniLeaderboard, fullLeaderboard, isLoading, leaderboardError, language]);
 
       return (
         <div className={`p-8 rounded-lg shadow-lg max-w-lg w-full text-center relative ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
@@ -433,22 +575,50 @@
               {darkMode ? '\u{2600}' : '\u{1F319}'}
             </button>
           )}
+          {gameState === 'languageSelect' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">
+                {language === 'en' ? '3rd Grade School Trivia Game' : '三年级学校知识竞赛'}
+              </h1>
+              <p className="text-lg mb-6">
+                {language === 'en' ? 'Select a language to start!' : '选择语言开始！'}
+              </p>
+              <div className="space-y-4">
+                <button
+                  onClick={() => handleLanguageSelect('en')}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => handleLanguageSelect('zh')}
+                  className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  中文
+                </button>
+              </div>
+            </div>
+          )}
           {gameState === 'mainMenu' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4 text-amber-600">3rd Grade School Trivia Game</h1>
-              <p className="text-lg mb-6">Welcome to the school trivia game!</p>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">
+                {language === 'en' ? '3rd Grade School Trivia Game' : '三年级学校知识竞赛'}
+              </h1>
+              <p className="text-lg mb-6">
+                {language === 'en' ? 'Welcome to the school trivia game!' : '欢迎参加学校知识竞赛！'}
+              </p>
               <div className="space-y-4">
                 <button
                   onClick={() => setGameState('leaderboardSelect')}
                   className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
-                  View Leaderboard
+                  {language === 'en' ? 'View Leaderboard' : '查看排行榜'}
                 </button>
                 <button
                   onClick={() => setGameState('playGame')}
                   className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
-                  Play Game
+                  {language === 'en' ? 'Play Game' : '开始游戏'}
                 </button>
               </div>
             </div>
@@ -456,26 +626,30 @@
 
           {gameState === 'leaderboardSelect' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4 text-amber-600">Leaderboards</h1>
-              <p className="text-lg mb-6">Select a leaderboard to view</p>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">
+                {language === 'en' ? 'Leaderboards' : '排行榜'}
+              </h1>
+              <p className="text-lg mb-6">
+                {language === 'en' ? 'Select a leaderboard to view' : '选择要查看的排行榜'}
+              </p>
               <div className="space-y-4">
                 <button
                   onClick={() => setGameState('miniLeaderboard')}
                   className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
-                  Mini Game Leaderboard
+                  {language === 'en' ? 'Mini Game Leaderboard' : '迷你游戏排行榜'}
                 </button>
                 <button
                   onClick={() => setGameState('fullLeaderboard')}
                   className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
-                  Full Game Leaderboard
+                  {language === 'en' ? 'Full Game Leaderboard' : '完整游戏排行榜'}
                 </button>
                 <button
                   onClick={() => setGameState('mainMenu')}
                   className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
-                  🪴 Back to Main Menu
+                  🪴 {language === 'en' ? 'Back to Main Menu' : '返回主菜单'}
                 </button>
               </div>
             </div>
@@ -484,7 +658,9 @@
           {(gameState === 'miniLeaderboard' || gameState === 'fullLeaderboard') && (
             <div>
               <h1 className="text-3xl font-bold mb-4 text-amber-600">
-                {gameState === 'miniLeaderboard' ? 'Mini Game Leaderboard' : 'Full Game Leaderboard'}
+                {language === 'en'
+                  ? (gameState === 'miniLeaderboard' ? 'Mini Game Leaderboard' : 'Full Game Leaderboard')
+                  : (gameState === 'miniLeaderboard' ? '迷你游戏排行榜' : '完整游戏排行榜')}
               </h1>
               <div className="space-y-4">
                 <div className="space-x-4">
@@ -492,26 +668,26 @@
                     onClick={() => setLeaderboardView('top5')}
                     className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                   >
-                    Top 5
+                    {language === 'en' ? 'Top 5' : '前5名'}
                   </button>
                   <button
                     onClick={() => setLeaderboardView('all')}
                     className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                   >
-                    All
+                    {language === 'en' ? 'All' : '全部'}
                   </button>
                 </div>
                 <button
                   onClick={() => setGameState('leaderboardSelect')}
                   className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
-                  Back to Leaderboard Selection
+                  {language === 'en' ? 'Back to Leaderboard Selection' : '返回排行榜选择'}
                 </button>
                 <button
                   onClick={() => setGameState('mainMenu')}
                   className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
-                  🪴 Back to Main Menu
+                  🪴 {language === 'en' ? 'Back to Main Menu' : '返回主菜单'}
                 </button>
               </div>
               {renderLeaderboards()}
@@ -520,26 +696,30 @@
 
           {gameState === 'playGame' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4 text-amber-600">Play Game</h1>
-              <p className="text-lg mb-6">Choose a game mode</p>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">
+                {language === 'en' ? 'Play Game' : '开始游戏'}
+              </h1>
+              <p className="text-lg mb-6">
+                {language === 'en' ? 'Choose a game mode' : '选择游戏模式'}
+              </p>
               <div className="space-y-4">
                 <button
                   onClick={() => handleModeSelect('mini')}
                   className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
-                  Play Mini Game (10 Questions, 20s Timer)
+                  {language === 'en' ? 'Play Mini Game (10 Questions, 20s Timer)' : '玩迷你游戏（10题，20秒计时）'}
                 </button>
                 <button
                   onClick={() => handleModeSelect('full')}
                   className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
-                  Play Full Game (20 Questions, No Timer)
+                  {language === 'en' ? 'Play Full Game (20 Questions, No Timer)' : '玩完整游戏（20题，无计时）'}
                 </button>
                 <button
                   onClick={() => setGameState('mainMenu')}
                   className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
-                  🪴 Back to Main Menu
+                  🪴 {language === 'en' ? 'Back to Main Menu' : '返回主菜单'}
                 </button>
               </div>
             </div>
@@ -547,12 +727,18 @@
 
           {gameState === 'nameInput' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4 text-amber-600">3rd Grade School Trivia Game</h1>
-              <p className="text-lg mb-6">Enter your name to start the {gameMode === 'mini' ? 'Mini' : 'Full'} Game!</p>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">
+                {language === 'en' ? '3rd Grade School Trivia Game' : '三年级学校知识竞赛'}
+              </h1>
+              <p className="text-lg mb-6">
+                {language === 'en' 
+                  ? `Enter your name to start the ${gameMode === 'mini' ? 'Mini' : 'Full'} Game!` 
+                  : `输入你的名字开始${gameMode === 'mini' ? '迷你' : '完整'}游戏！`}
+              </p>
               <form onSubmit={handleNameSubmit} className="space-y-4">
                 <input
                   type="text"
-                  placeholder="First Name"
+                  placeholder={language === 'en' ? 'First Name' : '名字'}
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   className={`w-full p-2 border rounded-lg ${darkMode ? 'bg-gray-700 text-gray-100' : 'bg-white text-gray-900'}`}
@@ -560,7 +746,7 @@
                 />
                 <input
                   type="text"
-                  placeholder="Last Name"
+                  placeholder={language === 'en' ? 'Last Name' : '姓氏'}
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   className={`w-full p-2 border rounded-lg ${darkMode ? 'bg-gray-700 text-gray-100' : 'bg-white text-gray-900'}`}
@@ -570,19 +756,19 @@
                   type="submit"
                   className="w-full bg-amber-600 text-white py-2 px-6 rounded-lg hover:bg-amber-700 transition-colors"
                 >
-                  Start Game
+                  {language === 'en' ? 'Start Game' : '开始游戏'}
                 </button>
                 <button
                   onClick={() => setGameState('playGame')}
                   className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
-                  Back to Play Game
+                  {language === 'en' ? 'Back to Play Game' : '返回游戏选择'}
                 </button>
                 <button
                   onClick={() => setGameState('mainMenu')}
                   className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
-                  🪴 Back to Main Menu
+                  🪴 {language === 'en' ? 'Back to Main Menu' : '返回主菜单'}
                 </button>
               </form>
             </div>
@@ -590,15 +776,23 @@
 
           {gameState === 'playing' && questions.length > 0 && (
             <div>
-              <h1 className="text-3xl font-bold mb-4 text-amber-600">3rd Grade School Trivia Game</h1>
-              <p className="text-lg mb-6">Welcome, {firstName} {lastName}!</p>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">
+                {language === 'en' ? '3rd Grade School Trivia Game' : '三年级学校知识竞赛'}
+              </h1>
+              <p className="text-lg mb-6">
+                {language === 'en' ? `Welcome, ${firstName} ${lastName}!` : `欢迎, ${firstName} ${lastName}！`}
+              </p>
               {gameMode === 'mini' && (
-                <p className="text-md mb-4 text-red-600">Time left: {timer}s</p>
+                <p className="text-md mb-4 text-red-600">
+                  {language === 'en' ? `Time left: ${timer}s` : `剩余时间: ${timer}秒`}
+                </p>
               )}
               <h2 className="text-xl font-semibold mb-4">
-                Question {currentQuestion + 1} of {questions.length}
+                {language === 'en'
+                  ? `Question ${currentQuestion + 1} of ${questions.length}`
+                  : `第 ${currentQuestion + 1} 题，共 ${questions.length} 题`}
               </h2>
-              <p className="text-lg mb-6">{questions[currentQuestion].question}</p>
+              <p className="text-lg mb-6">{questions[currentQuestion].question[language]}</p>
               <div className="space-y-4">
                 {shuffledOptions[currentQuestion]?.map((option, index) => (
                   <button
@@ -616,52 +810,58 @@
 
           {gameState === 'result' && (
             <div>
-              <h2 className="text-2xl font-semibold mb-4">Game Over, {firstName} {lastName}!</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                {language === 'en' ? `Game Over, ${firstName} ${lastName}!` : `游戏结束，${firstName} ${lastName}！`}
+              </h2>
               <p className="text-lg mb-6">
-                You scored {score} out of {questions.length}!
+                {language === 'en'
+                  ? `You scored ${score} out of ${questions.length}!`
+                  : `你得了 ${score} 分，共 ${questions.length} 题！`}
               </p>
               <p className="text-md mb-6">
-                Completed in {Math.round(totalTime)} seconds!
+                {language === 'en'
+                  ? `Completed in ${Math.round(totalTime)} seconds!`
+                  : `在 ${Math.round(totalTime)} 秒内完成！`}
               </p>
               <p className="text-md mb-6">
                 {score === questions.length
-                  ? "Perfect! You're a school trivia star!"
+                  ? (language === 'en' ? "Perfect! You're a school trivia star!" : "完美！你是一个学校知识明星！")
                   : score >= questions.length / 2
-                  ? "Great job! You know your school facts!"
-                  : "Nice try! Keep studying!"}
+                  ? (language === 'en' ? "Great job! You know your school facts!" : "干得好！你很懂得学校知识！")
+                  : (language === 'en' ? "Nice try! Keep studying!" : "不错！继续学习！")}
               </p>
               <div className="space-y-4">
                 <button
                   onClick={() => setLeaderboardType('mini')}
                   className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'mini' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                 >
-                  View Mini Game Leaderboard
+                  {language === 'en' ? 'View Mini Game Leaderboard' : '查看迷你游戏排行榜'}
                 </button>
                 <button
                   onClick={() => setLeaderboardType('full')}
                   className={`w-full py-2 px-6 rounded-lg ${leaderboardType === 'full' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                 >
-                  View Full Game Leaderboard
+                  {language === 'en' ? 'View Full Game Leaderboard' : '查看完整游戏排行榜'}
                 </button>
                 <div className="space-x-4">
                   <button
                     onClick={() => setLeaderboardView('top5')}
                     className={`py-2 px-4 rounded-lg ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                   >
-                    Top 5
+                    {language === 'en' ? 'Top 5' : '前5名'}
                   </button>
                   <button
                     onClick={() => setLeaderboardView('all')}
                     className={`py-2 px-4 rounded-lg ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                   >
-                    All
+                    {language === 'en' ? 'All' : '全部'}
                   </button>
                 </div>
                 <button
                   onClick={() => setGameState('mainMenu')}
                   className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
-                  🪴 Back to Main Menu
+                  🪴 {language === 'en' ? 'Back to Main Menu' : '返回主菜单'}
                 </button>
               </div>
               {renderLeaderboards()}
