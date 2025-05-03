@@ -20,7 +20,33 @@
     Your browser does not support the audio element.
   </audio>
 
+  <!-- Check for file:// protocol -->
+  <script>
+    if (window.location.protocol === 'file:') {
+      alert('Please serve this file using a local server to avoid CORS errors.\n\n' +
+            'Try:\n' +
+            '- Node.js: `npx serve`\n' +
+            '- Python: `python -m http.server 8000`\n' +
+            '- VS Code: Live Server extension\n\n' +
+            'Then access via http://localhost.');
+      document.getElementById('root').innerHTML = `
+        <div class="p-8 text-center text-red-600">
+          <h1>Cannot load app</h1>
+          <p>Please serve this file using a local server (e.g., npx serve, python -m http.server, VS Code Live Server).</p>
+        </div>
+      `;
+    } else {
+      console.log('Page served via HTTP/HTTPS, proceeding with script loading.');
+    }
+  </script>
+
   <script type="text/babel">
+    // Log script loading
+    console.log('React script loaded:', typeof React !== 'undefined');
+    console.log('ReactDOM script loaded:', typeof ReactDOM !== 'undefined');
+    console.log('Babel script loaded:', typeof Babel !== 'undefined');
+    console.log('Firebase script loaded:', typeof firebase !== 'undefined');
+
     // Error Boundary Component
     class ErrorBoundary extends React.Component {
       state = { hasError: false, error: null };
@@ -67,7 +93,7 @@
       console.log('Firebase initialized successfully');
     } catch (error) {
       console.error('Error initializing Firebase:', error);
-      alert('Failed to initialize Firebase. Please check the console for details.');
+      alert('Failed to initialize Firebase: ' + error.message);
     }
 
     // 20 school-themed questions for 3rd graders with translations
@@ -237,7 +263,7 @@
       const [leaderboardView, setLeaderboardView] = React.useState('top5');
       const [leaderboardError, setLeaderboardError] = React.useState(null);
       const [isLoading, setIsLoading] = React.useState(false);
-      const [questionStartTime, setQuestionStart standstillTime] = React.useState(null);
+      const [questionStartTime, setQuestionStartTime] = React.useState(null);
       const [muted, setMuted] = React.useState(false);
       const [darkMode, setDarkMode] = React.useState(false);
 
@@ -499,8 +525,8 @@
         } catch (error) {
           console.error('Error saving score:', error);
           alert(language === 'en'
-            ? 'Failed to save score. Please check your Firebase configuration.'
-            : '无法保存分数。请检查您的Firebase配置。');
+            ? 'Failed to save score: ' + error.message
+            : '无法保存分数：' + error.message);
         }
       };
 
@@ -674,7 +700,7 @@
                 </button>
                 <button
                   onClick={() => setGameState('mainMenu')}
-                  class saiba mais sobre este lugarclassName={`w-24 h-24 rounded-lg transition-colors flex flex-col items-center justify-center text-sm ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                  className={`w-24 h-24 rounded-lg transition-colors flex flex-col items-center justify-center text-sm ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   🏠 {language === 'en' ? <>Main<br />Menu</> : <>主<br />菜单</>}
                 </button>
@@ -954,6 +980,7 @@
           <TriviaGame />
         </ErrorBoundary>
       );
+      console.log('React app rendered successfully');
     } catch (error) {
       console.error('Error rendering React app:', error);
       document.getElementById('root').innerHTML = `
