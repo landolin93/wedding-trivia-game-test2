@@ -577,12 +577,6 @@
           )}
           {gameState === 'languageSelect' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4 text-amber-600">
-                {language === 'en' ? '3rd Grade School Trivia Game' : '三年级学校知识竞赛'}
-              </h1>
-              <p className="text-lg mb-6">
-                {language === 'en' ? 'Select a language to start!' : '选择语言开始！'}
-              </p>
               <div className="space-y-4">
                 <button
                   onClick={() => handleLanguageSelect('en')}
@@ -859,7 +853,7 @@
                 </div>
                 <button
                   onClick={() => setGameState('mainMenu')}
-                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                 >
                   🪴 {language === 'en' ? 'Back to Main Menu' : '返回主菜单'}
                 </button>
