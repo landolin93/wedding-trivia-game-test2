@@ -15,20 +15,20 @@
 <body class="bg-gray-200 font-sans">
   <div id="root" class="min-h-screen flex items-center justify-center"></div>
   <audio id="background-music" loop autoplay>
-    <source src="https://landolin93.github.io/wedding-trivia-game-test2/wedding-romantic-182518.mp3" type="audio/mpeg">
+    <source src="https://www.bensound.com/bensound-music/bensound-ukulele.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
 
   <script type="text/babel">
-    // Initialize Firebase
+    // Initialize Firebase (Placeholder: Replace with your Firebase config)
     const firebaseConfig = {
-      apiKey: "AIzaSyD-uMdBpQhau_mQRQwtUqDbNqlPR8LVfq4",
-      authDomain: "wedding-trivia-test.firebaseapp.com",
-      projectId: "wedding-trivia-test",
-      storageBucket: "wedding-trivia-test.firebasestorage.app",
-      messagingSenderId: "423493222722",
-      appId: "1:423493222722:web:0968dce8350c3ee8d4c8db",
-      measurementId: "G-LDT4H0GPFG"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
@@ -853,7 +853,7 @@
                 </div>
                 <button
                   onClick={() => setGameState('mainMenu')}
-                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
+                  className={`w-full py-2 px-6 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   🪴 {language === 'en' ? 'Back to Main Menu' : '返回主菜单'}
                 </button>
