@@ -638,12 +638,10 @@
               </div>
             </div>
           )}
-          {(gameState === 'miniLeaderboard' || gameState === 'fullLeaderboard') && (
+          {gameState === 'miniLeaderboard' && (
             <div>
               <h1 className="text-3xl font-bold mb-4 text-amber-600">
-                {language === 'en'
-                  ? (gameState === 'miniLeaderboard' ? 'Mini Game Leaderboard' : 'Full Game Leaderboard')
-                  : (gameState === 'miniLeaderboard' ? '迷你游戏排行榜' : '完整游戏排行榜')}
+                {language === 'en' ? 'Mini Game Leaderboard' : '迷你游戏排行榜'}
               </h1>
               <div className="flex flex-wrap space-x-4 justify-center mb-4">
                 <button
@@ -658,11 +656,55 @@
                 >
                   {language === 'en' ? 'All' : '全部'}
                 </button>
+              </div>
+              <div className="flex flex-wrap space-x-4 justify-center mb-4">
                 <button
-                  onClick={() => setGameState('leaderboardSelect')}
+                  onClick={() => setGameState('fullLeaderboard')}
                   className={`w-24 h-24 rounded-lg transition-colors flex flex-col items-center justify-center text-sm ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
-                  {language === 'en' ? <>Back to<br />Select</> : <>返回<br />选择</>}
+                  {language === 'en' ? <>Full Game<br />Leaderboard</> : <>完整游戏<br />排行榜</>}
+                </button>
+                <button
+                  onClick={() => setGameState('playGame')}
+                  className="w-24 h-24 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex flex-col items-center justify-center text-sm"
+                >
+                  {language === 'en' ? <>Play<br />Game</> : <>开始<br />游戏</>}
+                </button>
+                <button
+                  onClick={() => setGameState('mainMenu')}
+                  className={`w-24 h-24 rounded-lg transition-colors flex flex-col items-center justify-center text-sm ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                >
+                  🏠 {language === 'en' ? <>Main<br />Menu</> : <>主<br />菜单</>}
+                </button>
+              </div>
+              {renderLeaderboards()}
+            </div>
+          )}
+          {gameState === 'fullLeaderboard' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">
+                {language === 'en' ? 'Full Game Leaderboard' : '完整游戏排行榜'}
+              </h1>
+              <div className="flex flex-wrap space-x-4 justify-center mb-4">
+                <button
+                  onClick={() => setLeaderboardView('top5')}
+                  className={`w-12 h-12 rounded-lg flex items-center justify-center text-xs ${leaderboardView === 'top5' ? 'bg-amber-600 text-white' : darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                >
+                  {language === 'en' ? 'Top 5' : '前5'}
+                </button>
+                <button
+                  onClick={() => setLeaderboardView('all')}
+                  className={`w-12 h-12 rounded-lg flex items-center justify-center text-xs ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                >
+                  {language === 'en' ? 'All' : '全部'}
+                </button>
+              </div>
+              <div className="flex flex-wrap space-x-4 justify-center mb-4">
+                <button
+                  onClick={() => setGameState('miniLeaderboard')}
+                  className={`w-24 h-24 rounded-lg transition-colors flex flex-col items-center justify-center text-sm ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                >
+                  {language === 'en' ? <>Mini Game<br />Leaderboard</> : <>迷你游戏<br />排行榜</>}
                 </button>
                 <button
                   onClick={() => setGameState('playGame')}
@@ -779,13 +821,13 @@
                   : `第 ${currentQuestion + 1} 题，共 ${questions.length} 题`}
               </h2>
               <p className="text-lg mb-6">{questions[currentQuestion].question[language]}</p>
-              <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-2">
                 {shuffledOptions[currentQuestion]?.map((option, index) => (
                   <button
                     key={index}
                     onClick={() => handleAnswer(option)}
                     disabled={selectedOption !== null || answered || (gameMode === 'mini' && timer === 0)}
-                    className={`w-full py-2 px-4 rounded-lg text-left transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600 disabled:bg-gray-700' : 'bg-gray-200 hover:bg-gray-300 disabled:bg-gray-200'} disabled:cursor-not-allowed`}
+                    className={`w-32 h-32 rounded-lg text-left transition-colors p-2 flex items-start justify-start text-sm ${darkMode ? 'bg-gray-700 hover:bg-gray-600 disabled:bg-gray-700' : 'bg-gray-200 hover:bg-gray-300 disabled:bg-gray-200'} disabled:cursor-not-allowed`}
                   >
                     {option}
                   </button>
