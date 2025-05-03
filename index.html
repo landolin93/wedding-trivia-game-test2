@@ -318,6 +318,7 @@
 
       // Fetch leaderboards from Firestore
       const fetchLeaderboards = async () => {
+        console.log('Fetching leaderboards at:', new Date().toISOString());
         setIsLoading(true);
         setLeaderboardError(null);
         try {
@@ -355,12 +356,17 @@
         }
       };
 
-      // Fetch leaderboards when leaderboard screen is selected
+      // Poll leaderboards every 15 seconds
       React.useEffect(() => {
-        if (['miniLeaderboard', 'fullLeaderboard', 'result'].includes(gameState) && db) {
-          fetchLeaderboards();
+        if (['miniLeaderboard', 'fullLeaderboard', 'result'].includes(gameState) && db && !isLoading) {
+          fetchLeaderboards(); // Initial fetch
+          const interval = setInterval(() => {
+            console.log('Polling leaderboards at:', new Date().toISOString());
+            if (!isLoading) fetchLeaderboards();
+          }, 15000); // Every 15 seconds
+          return () => clearInterval(interval); // Cleanup
         }
-      }, [gameState]);
+      }, [gameState, isLoading]);
 
       // Initialize questions and options
       React.useEffect(() => {
