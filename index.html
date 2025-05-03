@@ -254,6 +254,7 @@
       const [questionElapsedTime, setQuestionElapsedTime] = React.useState(0);
       const [answered, setAnswered] = React.useState(false);
       const [totalTime, setTotalTime] = React.useState(0);
+      const [finalTime, setFinalTime] = React.useState(0);
       const [miniLeaderboard, setMiniLeaderboard] = React.useState([]);
       const [fullLeaderboard, setFullLeaderboard] = React.useState([]);
       const [leaderboardType, setLeaderboardType] = React.useState('mini');
@@ -469,6 +470,7 @@
             setQuestionElapsedTime(0);
             setAnswered(false);
             setTotalTime(0);
+            setFinalTime(0);
             setQuestionStartTime(null);
             setGameState('playing');
           } else {
@@ -547,7 +549,8 @@
           const leaderboardCollection = gameMode === 'mini' ? 'miniLeaderboard' : 'fullLeaderboard';
           const playerName = `${firstName} ${lastName}`;
           const finalTime = totalTime + ((performance.now() - questionStartTime) / 1000);
-          console.log('Saving completionTime:', finalTime);
+          console.log('Saving completionTime:', finalTime, 'totalTime:', totalTime, 'last question time:', ((performance.now() - questionStartTime) / 1000));
+          setFinalTime(finalTime);
           const newEntry = {
             name: playerName,
             score: finalScore,
@@ -598,6 +601,7 @@
           setQuestionElapsedTime(0);
           setAnswered(false);
           setTotalTime(0);
+          setFinalTime(0);
           setLeaderboardType('mini');
           setLeaderboardView('top5');
           setLeaderboardError(null);
@@ -624,6 +628,12 @@
               return acc;
             }, {})
           ).sort((a, b) => b.score - a.score || a.completionTime - b.completionTime);
+
+          console.log('Rendering leaderboard:', uniqueLeaderboard.map(entry => ({
+            name: entry.name,
+            score: entry.score,
+            time: formatTime(entry.completionTime)
+          })));
 
           return (
             <div>
@@ -974,8 +984,8 @@
               </p>
               <p className="text-md mb-6">
                 {language === 'en'
-                  ? `Completed in ${formatTime(totalTime)}!`
-                  : `在 ${formatTime(totalTime)} 内完成！`}
+                  ? `Completed in ${formatTime(finalTime)}!`
+                  : `在 ${formatTime(finalTime)} 内完成！`}
               </p>
               <p className="text-md mb-6">
                 {score === questions.length
@@ -992,8 +1002,7 @@
                   {language === 'en' ? 'Top 5' : '前5'}
                 </button>
                 <button
-                  o
-                  nClick={() => setLeaderboardView('all')}
+                  onClick={() => setLeaderboardView('all')}
                   className={`w-12 h-12 rounded-lg flex items-center justify-center text-xs ${leaderboardView === 'all' ? 'bg-amber-600 text-white' : darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   {language === 'en' ? 'All' : '全部'}
