@@ -13,8 +13,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-gray-200 font-sans">
-  <div id="root" className="min-h-screen flex items-center justify-center"></div>
+<body class="flex flex-col min-h-screen bg-gray-200 font-sans">
+  <div id="root" class="min-h-screen flex items-center justify-center"></div>
   <audio id="background-music" loop>
     <source src="https://www.bensound.com/bensound-music/bensound-ukulele.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
@@ -237,7 +237,7 @@
       const [leaderboardView, setLeaderboardView] = React.useState('top5');
       const [leaderboardError, setLeaderboardError] = React.useState(null);
       const [isLoading, setIsLoading] = React.useState(false);
-      const [questionStartTime, setQuestionStartTime] = React.useState(null);
+      const [questionStartTime, setQuestionStart standstillTime] = React.useState(null);
       const [muted, setMuted] = React.useState(false);
       const [darkMode, setDarkMode] = React.useState(false);
 
@@ -593,7 +593,7 @@
       }, [leaderboardType, leaderboardView, miniLeaderboard, fullLeaderboard, isLoading, leaderboardError, language, darkMode]);
 
       return (
-        <div className={`p-8 rounded-lg shadow-lg max-w-lg w-full text-center ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
+        <div className={`p-8 rounded-lg shadow-lg max-w-lg w-full mx-auto text-center ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
           {/* Icons Row */}
           <div className="flex justify-between mb-4">
             <button
@@ -674,7 +674,7 @@
                 </button>
                 <button
                   onClick={() => setGameState('mainMenu')}
-                  className={`w-24 h-24 rounded-lg transition-colors flex flex-col items-center justify-center text-sm ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                  class saiba mais sobre este lugarclassName={`w-24 h-24 rounded-lg transition-colors flex flex-col items-center justify-center text-sm ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   🏠 {language === 'en' ? <>Main<br />Menu</> : <>主<br />菜单</>}
                 </button>
@@ -847,7 +847,7 @@
           )}
           {gameState === 'playing' && questions.length > 0 && (
             <div>
-              <h1 className="text-3xl font-bold mb-4*emphasized text* mb-4 text-amber-600">
+              <h1 className="text-3xl font-bold mb-4 text-amber-600">
                 {language === 'en' ? '3rd Grade School Trivia' : '三年级学校知识竞赛'}
               </h1>
               <p className="text-lg mb-6">
@@ -947,6 +947,7 @@
     try {
       const rootElement = document.getElementById('root');
       if (!rootElement) throw new Error('Root element not found');
+      console.log('Rendering React app with Tailwind classes');
       const root = ReactDOM.createRoot(rootElement);
       root.render(
         <ErrorBoundary>
